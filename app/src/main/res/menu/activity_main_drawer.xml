@@ -3,36 +3,44 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/nav_maingroup" android:checkableBehavior="all">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_directions"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import"/>
+            android:title="@string/directions"/>
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_buses"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery"/>
+            android:title="@string/buses"/>
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_bikes"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow"/>
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools"/>
+            android:title="@string/bikes"/>
+        <!--<item-->
+            <!--android:id="@+id/nav_manage"-->
+            <!--android:icon="@drawable/ic_menu_manage"-->
+            <!--android:title="@string/schedule"/>-->
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share"/>
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send"/>
-        </menu>
-    </item>
+    <group android:id="@+id/nav_schedulegroup" android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_schedule"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/schedule"/>
+    </group>
+
+    <group android:id="@+id/nav_miscgroup" android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_settings"
+            android:title="@string/settings"/>
+            <!--android:icon="@drawable/ic_menu_share"-->
+        <item
+            android:id="@+id/nav_faw"
+            android:title="@string/faq"/>
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/feedback"/>
+    </group>
 
 </menu>
