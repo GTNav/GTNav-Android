@@ -6,37 +6,34 @@
     <group android:id="@+id/nav_maingroup" android:checkableBehavior="all">
         <item
             android:id="@+id/nav_directions"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_arrow_black"
             android:title="@string/directions"/>
         <item
             android:id="@+id/nav_buses"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_bus_black"
             android:title="@string/buses"/>
         <item
             android:id="@+id/nav_bikes"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_bike_black"
             android:title="@string/bikes"/>
-        <!--<item-->
-            <!--android:id="@+id/nav_manage"-->
-            <!--android:icon="@drawable/ic_menu_manage"-->
-            <!--android:title="@string/schedule"/>-->
     </group>
 
     <group android:id="@+id/nav_schedulegroup" android:checkableBehavior="all">
         <item
             android:id="@+id/nav_schedule"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_calendar_black"
             android:title="@string/schedule"/>
     </group>
 
     <group android:id="@+id/nav_miscgroup" android:checkableBehavior="all">
         <item
             android:id="@+id/nav_settings"
-            android:title="@string/settings"/>
-            <!--android:icon="@drawable/ic_menu_share"-->
+            android:title="@string/settings"
+            android:icon="@drawable/ic_settings_black"/>
         <item
             android:id="@+id/nav_faw"
-            android:title="@string/faq"/>
+            android:title="@string/faq"
+            android:icon="@drawable/ic_help_black"/>
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_menu_send"

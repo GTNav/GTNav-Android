@@ -34,38 +34,52 @@
         android:layout_gravity="center_horizontal"
         android:layout_row="1"
         android:columnCount="3"
-        android:rowCount="1"
         android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:rowCount="1"
         android:useDefaultMargins="true">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/directions_button"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
             android:layout_column="0"
-
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="50dp"
             android:layout_row="0"
-            android:text="button1"
+            android:adjustViewBounds="false"
+            android:background="@drawable/round_button"
+            android:cropToPadding="false"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_arrow_black"
             android:textAlignment="center"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/buses_button"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
             android:layout_column="1"
-
             android:layout_gravity="center_horizontal"
             android:layout_row="0"
-            android:text="button2"
+            android:background="@drawable/round_button"
+            android:cropToPadding="false"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_bus_black"
             android:textAlignment="center"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/bikes_button"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
             android:layout_column="2"
-
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="50dp"
             android:layout_row="0"
-            android:text="button3"
+            android:background="@drawable/round_button"
+            android:cropToPadding="false"
+            android:padding="11dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_bike_black"
             android:textAlignment="center"/>
 
     </GridLayout>
