@@ -31,7 +31,7 @@
             android:title="@string/settings"
             android:icon="@drawable/ic_settings_black"/>
         <item
-            android:id="@+id/nav_faw"
+            android:id="@+id/nav_faq"
             android:title="@string/faq"
             android:icon="@drawable/ic_help_black"/>
         <item
