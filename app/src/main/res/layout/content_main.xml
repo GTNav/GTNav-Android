@@ -56,6 +56,7 @@
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:textCursorDrawable="@drawable/color_cursor"
                 android:background="@android:color/transparent"
                 android:hint="@string/search_hint"
                 android:iconifiedByDefault="false"
@@ -74,6 +75,7 @@
             android:columnCount="3"
             android:orientation="horizontal"
             android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:rowCount="1"
             android:useDefaultMargins="true">
 
