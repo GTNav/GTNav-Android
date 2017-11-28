@@ -12,19 +12,54 @@
 
     <RelativeLayout android:layout_row="0">
 
-        <SearchView
-            android:id="@+id/search_bar"
+        <LinearLayout
+            android:id="@+id/search_bar_stackview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_alignParentTop="true"
-            android:layout_centerVertical="true">
-        </SearchView>
+            android:layout_centerVertical="true"
+            android:layout_margin="8dp"
+            android:background="@drawable/search_bar_border"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
+
+            <ImageButton
+                android:id="@+id/search_bar_menubutton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="15dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:cropToPadding="false"
+                android:paddingBottom="7dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="7dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_menu_black"/>
+
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/search_hint"
+                android:iconifiedByDefault="false"
+                android:queryHint="@string/search_hint"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/search_bar"
+            android:layout_below="@id/search_bar_stackview"
             android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
             android:text="Swipe from left side for menu!"/>
     </RelativeLayout>
 
