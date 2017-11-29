@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- GT colors: http://www.comm.gatech.edu/brand/colors -->
+
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#00254c</color> <!-- GT blue -->
+    <color name="colorPrimaryDark">#00172e</color>
+    <color name="colorAccent">#eeb211</color> <!-- GT gold -->
+    <color name="directionsBar">#00254c</color> <!-- GT Link hover -->
+    <color name="directionsBarEditText">#1c5189</color>
+    <color name="directionsTextHint">#b7ffffff</color>
 </resources>

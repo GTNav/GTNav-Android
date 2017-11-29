@@ -24,7 +24,7 @@
             map:cameraZoom="15.5"/>
 
         <LinearLayout
-            android:id="@+id/search_bar_stackview"
+            android:id="@+id/search_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentTop="true"
@@ -58,6 +58,7 @@
                 android:layout_height="match_parent"
                 android:textCursorDrawable="@drawable/color_cursor"
                 android:background="@android:color/transparent"
+                android:singleLine="true"
                 android:hint="@string/search_hint"
                 android:iconifiedByDefault="false"
                 android:queryHint="@string/search_hint"
@@ -91,7 +92,7 @@
                 android:cropToPadding="false"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_arrow_black"
+                android:src="@drawable/ic_directions_arrow_black"
                 android:textAlignment="center" />
 
             <ImageButton
