@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Fragment newFragment = null;
-        Class fragmentClass;
 
         if (id == R.id.nav_directions) {
             newFragment = new DirectionsFragment();
@@ -95,24 +95,63 @@ public class MainActivity extends AppCompatActivity
 
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, newFragment)
-                    .commit();
+            Fragment curFragment = fragmentManager.findFragmentById(R.id.content_frame);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            //if its a new page, replace it
+            if (!curFragment.getClass().equals(newFragment.getClass())) {
+                fragmentTransaction.replace(R.id.content_frame, newFragment);
+                fragmentTransaction.addToBackStack(null); //allow back button to lead back to MainFragment
+                fragmentTransaction.commit();
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         closeDrawer();
         return true;
     }
 
-    public void openDrawer(){
+    public void uncheckAllMenuItems() {
+        final Menu menu = ((NavigationView) findViewById(R.id.nav_view)).getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setChecked(false);
+        }
+    }
+
+    public void openDirectionsFragment() {
+        NavigationView menu = findViewById(R.id.nav_view);
+        menu.setCheckedItem(R.id.nav_directions);
+
+        Fragment directionsFragment = new DirectionsFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, directionsFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openBusesFragment() {
+        NavigationView menu = findViewById(R.id.nav_view);
+        menu.setCheckedItem(R.id.nav_buses);
+
+        Fragment busesFragment = new BusesFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, busesFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openDrawer() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.openDrawer(GravityCompat.START);
     }
 
-    public void closeDrawer(){
+    public void closeDrawer() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }

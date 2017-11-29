@@ -29,7 +29,7 @@ public class MainFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private ImageButton menuButton;
+    private ImageButton menuButton, directionsButton, busesButton, bikesButton;
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,6 +77,24 @@ public class MainFragment extends Fragment {
                 ((MainActivity) getActivity()).openDrawer(); //opens the navigation drawer
             }
         });
+
+        directionsButton = v.findViewById(R.id.directions_button);
+        directionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openDirectionsFragment(); //opens directions page
+            }
+        });
+
+        busesButton = v.findViewById(R.id.buses_button);
+        busesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openBusesFragment(); //opens buses page
+            }
+        });
+
+        ((MainActivity) getActivity()).uncheckAllMenuItems();
 
         return v;
     }
