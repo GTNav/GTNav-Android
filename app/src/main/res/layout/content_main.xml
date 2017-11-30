@@ -13,15 +13,15 @@
     <RelativeLayout android:layout_row="0">
 
         <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.spybug.gtnav.MapsActivity"
-            map:cameraTargetLat="33.7756"
-            map:cameraTargetLng="-84.3963"
-            map:cameraTilt="0"
-            map:cameraZoom="15.5"/>
+                  android:id="@+id/map"
+                  android:name="com.google.android.gms.maps.SupportMapFragment"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  tools:context="com.spybug.gtnav.MapsActivity"
+                  map:cameraTargetLat="33.7756"
+                  map:cameraTargetLng="-84.3963"
+                  map:cameraTilt="0"
+                  map:cameraZoom="15.5"/>
 
         <LinearLayout
             android:id="@+id/search_bar_layout"
@@ -65,7 +65,22 @@
                 android:textSize="18sp" />
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@id/bottom_bar"
+            android:layout_alignEnd="@id/bottom_bar"
+            android:background="@drawable/round_report_button"
+            android:scaleType="fitCenter"
+            android:padding="11dp"
+            android:layout_marginBottom="25dp"
+            android:layout_marginEnd="15dp"
+            android:tint="#FFFFFF"
+            android:src="@drawable/ic_traffic_cone"/>
+
         <GridLayout
+            android:id="@+id/bottom_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -82,11 +97,12 @@
 
             <LinearLayout
                 android:layout_width="75dp"
-                android:layout_height="75dp"
+                android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_marginStart="50dp"
                 android:layout_row="0"
                 android:orientation="vertical">
+
                 <ImageButton
                     android:id="@+id/directions_button"
                     android:layout_width="60dp"
@@ -97,28 +113,29 @@
                     android:cropToPadding="false"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
-                    android:tint="@color/colorAccent"
                     android:src="@drawable/ic_directions_arrow_black"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:tint="@color/colorAccent"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textSize="14sp"
                     android:gravity="center_horizontal"
+                    android:text="@string/directions"
                     android:textAlignment="center"
-                    android:text="@string/directions"/>
+                    android:textSize="14sp"/>
             </LinearLayout>
 
 
             <LinearLayout
                 android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_gravity="center"
+                android:layout_height="wrap_content"
                 android:layout_column="1"
+                android:layout_gravity="center"
                 android:layout_row="0"
                 android:orientation="vertical">
+
                 <ImageButton
                     android:id="@+id/buses_button"
                     android:layout_width="60dp"
@@ -129,27 +146,28 @@
                     android:cropToPadding="false"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
-                    android:tint="@color/colorAccent"
                     android:src="@drawable/ic_bus_black"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:tint="@color/colorAccent"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textSize="14sp"
                     android:gravity="center_horizontal"
+                    android:text="@string/buses"
                     android:textAlignment="center"
-                    android:text="@string/buses"/>
+                    android:textSize="14sp"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="75dp"
-                android:layout_height="75dp"
+                android:layout_height="wrap_content"
                 android:layout_column="2"
                 android:layout_marginEnd="50dp"
                 android:layout_row="0"
                 android:orientation="vertical">
+
                 <ImageButton
                     android:id="@+id/bikes_button"
                     android:layout_width="60dp"
@@ -160,18 +178,18 @@
                     android:cropToPadding="false"
                     android:padding="11dp"
                     android:scaleType="fitCenter"
-                    android:tint="@color/colorAccent"
                     android:src="@drawable/ic_bike_black"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:tint="@color/colorAccent"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textSize="14sp"
                     android:gravity="center_horizontal"
+                    android:text="@string/bikes"
                     android:textAlignment="center"
-                    android:text="@string/bikes"/>
+                    android:textSize="14sp"/>
             </LinearLayout>
 
         </GridLayout>
