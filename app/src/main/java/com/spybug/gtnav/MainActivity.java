@@ -80,17 +80,17 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_buses) {
             newFragment = new BusesFragment();
         } else if (id == R.id.nav_bikes) {
-            newFragment = new DirectionsFragment();
+            newFragment = new BikesFragment();
         } else if (id == R.id.nav_schedule) {
-            newFragment = new DirectionsFragment();
+            newFragment = new ScheduleFragment();
         } else if (id == R.id.nav_settings) {
-            newFragment = new DirectionsFragment();
+            newFragment = new ScheduleFragment();
         } else if (id == R.id.nav_faq) {
-            newFragment = new DirectionsFragment();
+            newFragment = new ScheduleFragment();
         } else if (id == R.id.nav_feedback) {
-            newFragment = new DirectionsFragment();
+            newFragment = new ScheduleFragment();
         } else {
-            newFragment = new DirectionsFragment();
+            newFragment = new ScheduleFragment();
         }
 
         try {
@@ -101,7 +101,9 @@ public class MainActivity extends AppCompatActivity
             //if its a new page, replace it
             if (!curFragment.getClass().equals(newFragment.getClass())) {
                 fragmentTransaction.replace(R.id.content_frame, newFragment);
-                fragmentTransaction.addToBackStack(null); //allow back button to lead back to MainFragment
+                if (curFragment instanceof MainFragment) {
+                    fragmentTransaction.addToBackStack(null); //allow back button to lead back to MainFragment if leaving it
+                }
                 fragmentTransaction.commit();
             }
 
@@ -122,28 +124,46 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void openDirectionsFragment() {
-        NavigationView menu = findViewById(R.id.nav_view);
-        menu.setCheckedItem(R.id.nav_directions);
-
+    public void openDirectionsFragment(boolean addPrevToStack) {
         Fragment directionsFragment = new DirectionsFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, directionsFragment)
-                .addToBackStack(null)
-                .commit();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, directionsFragment);
+        if (addPrevToStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
+        fragmentTransaction.commit();
+
+        NavigationView menu = findViewById(R.id.nav_view);
+        menu.setCheckedItem(R.id.nav_directions);
     }
 
-    public void openBusesFragment() {
-        NavigationView menu = findViewById(R.id.nav_view);
-        menu.setCheckedItem(R.id.nav_buses);
-
+    public void openBusesFragment(boolean addPrevToStack) {
         Fragment busesFragment = new BusesFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, busesFragment)
-                .addToBackStack(null)
-                .commit();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, busesFragment);
+        if (addPrevToStack) {
+                fragmentTransaction.addToBackStack(null);
+        }
+        fragmentTransaction.commit();
+
+        NavigationView menu = findViewById(R.id.nav_view);
+        menu.setCheckedItem(R.id.nav_buses);
+    }
+
+    public void openBikesFragment(boolean addPrevToStack) {
+        Fragment bikesFragment = new BikesFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, bikesFragment);
+        if (addPrevToStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
+        fragmentTransaction.commit();
+
+        NavigationView menu = findViewById(R.id.nav_view);
+        menu.setCheckedItem(R.id.nav_bikes);
     }
 
     public void openDrawer() {

@@ -82,7 +82,7 @@ public class MainFragment extends Fragment {
         directionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).openDirectionsFragment(); //opens directions page
+                ((MainActivity) getActivity()).openDirectionsFragment(true); //opens directions page
             }
         });
 
@@ -90,7 +90,15 @@ public class MainFragment extends Fragment {
         busesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).openBusesFragment(); //opens buses page
+                ((MainActivity) getActivity()).openBusesFragment(true); //opens buses page
+            }
+        });
+
+        bikesButton = v.findViewById(R.id.bikes_button);
+        bikesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openBikesFragment(true); //opens bikes page
             }
         });
 

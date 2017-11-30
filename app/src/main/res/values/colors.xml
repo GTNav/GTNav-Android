@@ -4,6 +4,7 @@
 <resources>
     <color name="colorPrimary">#00254c</color> <!-- GT blue -->
     <color name="colorPrimaryDark">#00172e</color>
+    <color name="colorPrimaryLight">#004996</color>
     <color name="colorAccent">#eeb211</color> <!-- GT gold -->
     <color name="directionsBar">#00254c</color> <!-- GT Link hover -->
     <color name="directionsBarEditText">#1c5189</color>

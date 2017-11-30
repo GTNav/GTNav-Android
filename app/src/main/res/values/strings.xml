@@ -7,8 +7,11 @@
 
     <!--Menu items strings-->
     <string name="directions">Directions</string>
+    <string name="directions_underline"><u>Directions</u></string>
     <string name="bikes">Bikes</string>
+    <string name="bikes_underline"><u>Bikes</u></string>
     <string name="buses">Buses</string>
+    <string name="buses_underline"><u>Buses</u></string>
     <string name="schedule">Schedule</string>
     <string name="settings">Settings</string>
     <string name="faq">FAQ</string>
