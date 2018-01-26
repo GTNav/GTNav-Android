@@ -5,10 +5,14 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 
 /**
@@ -89,6 +93,32 @@ public class DirectionsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 ((MainActivity) getActivity()).openBikesFragment(false);
+            }
+        });
+
+        final EditText startLocation = v.findViewById(R.id.start_location);
+        final EditText endLocation = v.findViewById(R.id.end_location);
+        final View myview = v;
+        startLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    new MapServerRequest().execute(startLocation.getText().toString(),
+                            endLocation.getText().toString(), myview);
+                    return true;
+                }
+                return false;
+            }
+        });
+        endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    new MapServerRequest().execute(startLocation.getText().toString(),
+                            endLocation.getText().toString(), myview);
+                    return true;
+                }
+                return false;
             }
         });
 

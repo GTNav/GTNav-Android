@@ -52,6 +52,7 @@
                         android:tint="#FFFFFF"/>
 
                     <EditText
+                        android:id="@+id/start_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -66,7 +67,8 @@
                         android:textColor="#FFFFFF"
                         android:textColorHint="@color/directionsTextHint"
                         android:textCursorDrawable="@drawable/white_color_cursor"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp"
+                        android:imeOptions="actionDone" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -86,6 +88,7 @@
                         android:tint="#FFFFFF"/>
 
                     <EditText
+                        android:id="@+id/end_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -100,7 +103,8 @@
                         android:textColor="#FFFFFF"
                         android:textColorHint="@color/directionsTextHint"
                         android:textCursorDrawable="@drawable/white_color_cursor"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp"
+                        android:imeOptions="actionDone" />
                 </LinearLayout>
             </LinearLayout>
 
