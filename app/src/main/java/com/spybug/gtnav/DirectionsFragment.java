@@ -14,6 +14,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +36,8 @@ public class DirectionsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private MapView mapView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -119,6 +125,15 @@ public class DirectionsFragment extends Fragment {
                     return true;
                 }
                 return false;
+            }
+        });
+
+        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+
             }
         });
 
