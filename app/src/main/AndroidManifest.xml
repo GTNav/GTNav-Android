@@ -3,13 +3,12 @@
     package="com.spybug.gtnav">
 
     <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
+         Location permissions for mapbox
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".GTNavApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
@@ -42,9 +41,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"/>
     </application>
 
 </manifest>

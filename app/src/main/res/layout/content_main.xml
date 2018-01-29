@@ -10,74 +10,9 @@
     android:rowCount="2"
     android:columnCount="1">
 
-    <RelativeLayout android:layout_row="0">
-
-        <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
-                  android:id="@+id/map"
-                  android:name="com.google.android.gms.maps.SupportMapFragment"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  tools:context="com.spybug.gtnav.MapsActivity"
-                  map:cameraTargetLat="33.7756"
-                  map:cameraTargetLng="-84.3963"
-                  map:cameraTilt="0"
-                  map:cameraZoom="15.5"/>
-
-        <LinearLayout
-            android:id="@+id/search_bar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentTop="true"
-            android:layout_margin="8dp"
-            android:background="@drawable/search_bar_border"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp">
-
-            <ImageButton
-                android:id="@+id/search_bar_menubutton"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginRight="15dp"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:cropToPadding="false"
-                android:paddingBottom="7dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="7dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_menu_black" />
-
-            <EditText
-                android:id="@+id/search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textCursorDrawable="@drawable/color_cursor"
-                android:background="@android:color/transparent"
-                android:singleLine="true"
-                android:hint="@string/search_hint"
-                android:iconifiedByDefault="false"
-                android:queryHint="@string/search_hint"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_above="@id/bottom_bar"
-            android:layout_alignEnd="@id/bottom_bar"
-            android:background="@drawable/round_report_button"
-            android:scaleType="fitCenter"
-            android:padding="11dp"
-            android:layout_marginBottom="25dp"
-            android:layout_marginEnd="15dp"
-            android:tint="#FFFFFF"
-            android:src="@drawable/ic_traffic_cone"/>
+    <RelativeLayout android:layout_row="0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <GridLayout
             android:id="@+id/bottom_bar"
@@ -86,7 +21,6 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_gravity="center_horizontal"
-            android:layout_row="1"
             android:background="@drawable/bottom_bar_border"
             android:columnCount="3"
             android:orientation="horizontal"
@@ -193,6 +127,79 @@
             </LinearLayout>
 
         </GridLayout>
+
+        <com.mapbox.mapboxsdk.maps.MapView android:id="@+id/mapView"
+                  xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_above="@id/bottom_bar"
+                  android:layout_marginBottom="-4dp"
+                  mapbox:mapbox_cameraTargetLat="33.7756"
+                  mapbox:mapbox_cameraTargetLng="-84.3963"
+                  mapbox:mapbox_cameraZoom="14"
+                  mapbox:mapbox_cameraZoomMax="18"
+                  mapbox:mapbox_cameraZoomMin="9"
+                  mapbox:mapbox_myLocation="true"
+                  mapbox:mapbox_uiTiltGestures="false"
+                  mapbox:mapbox_uiCompass="true"
+                  mapbox:mapbox_uiCompassMarginTop="75dp"
+                  />
+
+        <LinearLayout
+            android:id="@+id/search_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_margin="8dp"
+            android:background="@drawable/search_bar_border"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
+
+            <ImageButton
+                android:id="@+id/search_bar_menubutton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="15dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:cropToPadding="false"
+                android:paddingBottom="7dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="7dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_menu_black" />
+
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:background="@android:color/transparent"
+                android:singleLine="true"
+                android:hint="@string/search_hint"
+                android:iconifiedByDefault="false"
+                android:queryHint="@string/search_hint"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@id/bottom_bar"
+            android:layout_alignEnd="@id/bottom_bar"
+            android:background="@drawable/round_report_button"
+            android:scaleType="fitCenter"
+            android:padding="11dp"
+            android:layout_marginBottom="25dp"
+            android:layout_marginEnd="15dp"
+            android:tint="#FFFFFF"
+            android:src="@drawable/ic_traffic_cone"/>
 
 
     </RelativeLayout>

@@ -10,6 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +34,7 @@ public class MainFragment extends Fragment {
     private String mParam2;
 
     private ImageButton menuButton, directionsButton, busesButton, bikesButton;
+    private MapView mapView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -104,6 +109,15 @@ public class MainFragment extends Fragment {
 
         ((MainActivity) getActivity()).uncheckAllMenuItems();
 
+        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+
+            }
+        });
+
         return v;
     }
 
@@ -123,6 +137,12 @@ public class MainFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
     /**
