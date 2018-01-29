@@ -5,6 +5,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,30 +105,41 @@ public class DirectionsFragment extends Fragment {
 
         final EditText startLocation = v.findViewById(R.id.start_location);
         final EditText endLocation = v.findViewById(R.id.end_location);
-        final View myview = v;
+        final String result[] = new String[1];
         startLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(startLocation.getText().toString(),
-                            endLocation.getText().toString(), myview);
-                    return true;
+                try {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        result[0] = (String) new MapServerRequest().execute(startLocation.getText().toString(),
+                                endLocation.getText().toString()).get();
+                        Log.d("Directions", result[0]);
+                        return true;
+                    }
+                    return false;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
                 }
-                return false;
             }
         });
         endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(startLocation.getText().toString(),
-                            endLocation.getText().toString(), myview);
-                    return true;
+                try {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        result[0] = (String) new MapServerRequest().execute(startLocation.getText().toString(),
+                                endLocation.getText().toString()).get();
+                        Log.d("Directions", result[0]);
+                        return true;
+                    }
+                    return false;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
                 }
-                return false;
             }
         });
-
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
