@@ -5,6 +5,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.widget.TextView;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
+import java.io.IOException;
+
+import retrofit.Response;
 
 
 /**
@@ -104,13 +109,12 @@ public class DirectionsFragment extends Fragment {
 
         final EditText startLocation = v.findViewById(R.id.start_location);
         final EditText endLocation = v.findViewById(R.id.end_location);
-        final View myview = v;
+        final View myView = v;
         startLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(startLocation.getText().toString(),
-                            endLocation.getText().toString(), myview);
+                    new MapServerRequest().execute(myView, getString(R.string.mapbox_key));
                     return true;
                 }
                 return false;
@@ -120,8 +124,7 @@ public class DirectionsFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(startLocation.getText().toString(),
-                            endLocation.getText().toString(), myview);
+                    new MapServerRequest().execute(myView, getString(R.string.mapbox_key));
                     return true;
                 }
                 return false;
