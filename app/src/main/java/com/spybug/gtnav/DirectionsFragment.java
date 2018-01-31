@@ -1,6 +1,7 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,11 +16,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import retrofit.Response;
 
@@ -120,18 +124,29 @@ public class DirectionsFragment extends Fragment {
                 return false;
             }
         });
+
+        mapView = (MapView) v.findViewById(R.id.mapView);
+
         endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(myView, getString(R.string.mapbox_key));
-                    return true;
+                    try {
+                        LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
+                        /*Draw Points on MapView
+                            mapView.addPolyline(new PolylineOptions()
+                                .add(points)
+                                .color(Color.parseColor(“#009688”))
+                               .width(5)); */
+                        return true;
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
         });
 
-        mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override

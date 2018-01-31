@@ -8,16 +8,16 @@ import android.widget.TextView;
 
 import com.mapbox.directions.DirectionsCriteria;
 import com.mapbox.directions.MapboxDirections;
+import com.mapbox.directions.service.models.DirectionsResponse;
+import com.mapbox.directions.service.models.DirectionsRoute;
 import com.mapbox.directions.service.models.Waypoint;
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.io.IOException;
+import java.util.List;
 
 import retrofit.Response;
 
@@ -39,6 +39,7 @@ public class MapServerRequest extends AsyncTask {
         EditText startText = view.findViewById(R.id.start_location);
         EditText endText = view.findViewById(R.id.end_location);
 
+        LatLng[] points = new LatLng[0];
         String start = startText.getText().toString();
         String end = endText.getText().toString();
 
@@ -60,12 +61,9 @@ public class MapServerRequest extends AsyncTask {
             GeocoderFeature start_result = geo_response_start.body().getFeatures().get(0);
             GeocoderFeature end_result = geo_response_end.body().getFeatures().get(0);
 
-            startText.setText(start_result.getPlaceName());
-            endText.setText(end_result.getPlaceName());
-
             Waypoint origin = new Waypoint(start_result.getLongitude(), start_result.getLatitude());
             Waypoint destination = new Waypoint(end_result.getLongitude(), end_result.getLatitude());
-            
+
             MapboxDirections client = new MapboxDirections.Builder()
                     .setAccessToken(mapboxApiKey)
                     .setOrigin(origin)
@@ -73,17 +71,25 @@ public class MapServerRequest extends AsyncTask {
                     .setProfile(DirectionsCriteria.PROFILE_WALKING)
                     .build();
 
-            Response response = client.execute();
+            Response<DirectionsResponse> response = client.execute();
             Log.v("Directions Result", "Getting directions successful!");
+
+            DirectionsRoute route = response.body().getRoutes().get(0);
+
+            // Convert Waypoints List into LatLng[]
+            List<Waypoint> waypoints = route.getGeometry().getWaypoints();
+            points = new LatLng[waypoints.size()];
+            for (int i = 0; i < waypoints.size(); i++) {
+                points[i] = new LatLng(
+                        waypoints.get(i).getLatitude(),
+                        waypoints.get(i).getLongitude());
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-
-        //TODO
-        return view;
+        return points;
     }
 
     @Override
