@@ -47,6 +47,7 @@ public class DirectionsFragment extends Fragment {
     private String mParam2;
 
     private MapView mapView;
+    private MapboxMap map;
 
     private OnFragmentInteractionListener mListener;
 
@@ -126,18 +127,29 @@ public class DirectionsFragment extends Fragment {
         });
 
         mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                map = mapboxMap;
+            }
+        });
+
 
         endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     try {
-                        LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
-                        /*Draw Points on MapView
-                            mapView.addPolyline(new PolylineOptions()
+                        final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
+                            map.clear();
+                            //Draw Points on Map
+                            map.addPolyline(new PolylineOptions()
                                 .add(points)
-                                .color(Color.parseColor(“#009688”))
-                               .width(5)); */
+                                .color(Color.parseColor("red"))
+                               .width(5));
+
                         return true;
                     } catch(Exception e) {
                         e.printStackTrace();
@@ -147,13 +159,7 @@ public class DirectionsFragment extends Fragment {
             }
         });
 
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
 
-            }
-        });
 
         return v;
     }
