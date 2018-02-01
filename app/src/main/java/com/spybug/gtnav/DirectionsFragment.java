@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -123,16 +124,6 @@ public class DirectionsFragment extends Fragment {
         final EditText startLocation = v.findViewById(R.id.start_location);
         final EditText endLocation = v.findViewById(R.id.end_location);
         final View myView = v;
-        startLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    new MapServerRequest().execute(myView, getString(R.string.mapbox_key));
-                    return true;
-                }
-                return false;
-            }
-        });
 
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -157,10 +148,14 @@ public class DirectionsFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    //hide the keyboard
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
                     try {
                         final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
                         drawPoints(points);
-
+                        
                         return true;
                     }
                     catch(Exception e) {
