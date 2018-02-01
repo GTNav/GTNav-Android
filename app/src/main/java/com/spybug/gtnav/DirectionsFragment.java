@@ -1,7 +1,13 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,16 +22,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import retrofit.Response;
+import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
 
 
 /**
@@ -48,6 +54,8 @@ public class DirectionsFragment extends Fragment {
 
     private MapView mapView;
     private MapboxMap map;
+
+    private Icon start_icon, destination_icon;
 
     private OnFragmentInteractionListener mListener;
 
@@ -137,21 +145,25 @@ public class DirectionsFragment extends Fragment {
         });
 
 
+        Resources resources = getResources();
+        IconFactory iconFactory = IconFactory.getInstance(v.getContext());
+        Drawable startMarkerDrawable = resources.getDrawable(R.drawable.start_marker);
+
+        Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
+        start_icon = iconFactory.fromBitmap(start_marker_icon);
+        destination_icon = iconFactory.defaultMarker();
+
         endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     try {
                         final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
-                            map.clear();
-                            //Draw Points on Map
-                            map.addPolyline(new PolylineOptions()
-                                .add(points)
-                                .color(Color.parseColor("red"))
-                               .width(5));
+                        drawPoints(points);
 
                         return true;
-                    } catch(Exception e) {
+                    }
+                    catch(Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -162,6 +174,25 @@ public class DirectionsFragment extends Fragment {
 
 
         return v;
+    }
+
+    public void drawPoints(LatLng[] points) {
+        map.clear();
+        //Draw Points on Map
+        map.addPolyline(new PolylineOptions()
+                .add(points)
+                .color(Color.parseColor("red"))
+                .width(5));
+
+        map.addMarker(new MarkerOptions()
+                .position(points[0])
+                .title("Start")
+                .icon(start_icon));
+
+        map.addMarker(new MarkerOptions()
+                .position(points[points.length - 1])
+                .title("Destination")
+                .icon(destination_icon));
     }
 
     // TODO: Rename method, update argument and hook method into UI event
