@@ -27,7 +27,9 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -155,7 +157,7 @@ public class DirectionsFragment extends Fragment {
                     try {
                         final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
                         drawPoints(points);
-                        
+
                         return true;
                     }
                     catch(Exception e) {
@@ -179,13 +181,23 @@ public class DirectionsFragment extends Fragment {
                 .color(Color.parseColor("red"))
                 .width(5));
 
+        LatLng firstPoint = points[0];
+        LatLng lastPoint  = points[points.length - 1];
+
+        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                .include(firstPoint)
+                .include(lastPoint)
+                .build();
+
+        map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 250), 2500);
+
         map.addMarker(new MarkerOptions()
-                .position(points[0])
+                .position(firstPoint)
                 .title("Start")
                 .icon(start_icon));
 
         map.addMarker(new MarkerOptions()
-                .position(points[points.length - 1])
+                .position(lastPoint)
                 .title("Destination")
                 .icon(destination_icon));
     }
