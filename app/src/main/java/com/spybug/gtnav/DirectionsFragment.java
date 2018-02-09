@@ -162,7 +162,11 @@ public class DirectionsFragment extends Fragment {
                     }
                     catch(Exception e) {
                         e.printStackTrace();
+                        return false;
                     }
+                }
+                else {
+                    return false;
                 }
             }
         });

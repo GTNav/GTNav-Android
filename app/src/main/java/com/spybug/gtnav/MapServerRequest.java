@@ -15,8 +15,18 @@ import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.services.commons.geojson.LineString;
+import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.commons.utils.PolylineUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 import retrofit.Response;
@@ -46,7 +56,10 @@ public class MapServerRequest extends AsyncTask {
         LatLng[] points = new LatLng[0];
         String start = startText.getText().toString();
         String end = endText.getText().toString();
-
+        String inputLine;
+        String stringUrl;
+        String result;
+        String routeGeometry;
 
         MapboxGeocoder geo_client1 = new MapboxGeocoder.Builder()
                 .setAccessToken(mapboxApiKey)
@@ -65,28 +78,66 @@ public class MapServerRequest extends AsyncTask {
             GeocoderFeature start_result = geo_response_start.body().getFeatures().get(0);
             GeocoderFeature end_result = geo_response_end.body().getFeatures().get(0);
 
-            Waypoint origin = new Waypoint(start_result.getLongitude(), start_result.getLatitude());
-            Waypoint destination = new Waypoint(end_result.getLongitude(), end_result.getLatitude());
+            stringUrl = String.format("https://gtnavtest.azurewebsites.net/directions?origin=%s,%s&destination=%s,%s&mode=%s",
+                    start_result.getLongitude(), start_result.getLatitude(),
+                    end_result.getLongitude(), end_result.getLatitude(),
+                    "walking");
 
-            MapboxDirections client = new MapboxDirections.Builder()
-                    .setAccessToken(mapboxApiKey)
-                    .setOrigin(origin)
-                    .setDestination(destination)
-                    .setProfile(DirectionsCriteria.PROFILE_WALKING)
-                    .build();
+            try {
+                //Create a URL object holding our url
+                URL myUrl = new URL(stringUrl);
+                //Create a connection
+                HttpURLConnection connection =(HttpURLConnection)
+                        myUrl.openConnection();
+                //Set methods and timeouts
+                connection.setRequestMethod(REQUEST_METHOD);
+                connection.setReadTimeout(READ_TIMEOUT);
+                connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
-            Response<DirectionsResponse> response = client.execute();
-            Log.v("Directions Result", "Getting directions successful!");
+                //Connect to our url
+                connection.connect();
+                //Create a new InputStreamReader
+                InputStreamReader streamReader = new
+                        InputStreamReader(connection.getInputStream());
+                //Create a new buffered reader and String Builder
+                BufferedReader reader = new BufferedReader(streamReader);
+                StringBuilder stringBuilder = new StringBuilder();
+                //Check if the line we are reading is not null
+                while((inputLine = reader.readLine()) != null){
+                    stringBuilder.append(inputLine);
+                }
+                //Close our InputStream and Buffered reader
+                reader.close();
+                streamReader.close();
+                //Set our result equal to our stringBuilder
+                result = stringBuilder.toString();
+            }
+            catch(IOException e){
+                e.printStackTrace();
+                result = null;
+            }
 
-            DirectionsRoute route = response.body().getRoutes().get(0);
+            List<Position> positionList = null;
 
-            // Convert Waypoints List into LatLng[]
-            List<Waypoint> waypoints = route.getGeometry().getWaypoints();
-            points = new LatLng[waypoints.size()];
-            for (int i = 0; i < waypoints.size(); i++) {
-                points[i] = new LatLng(
-                        waypoints.get(i).getLatitude(),
-                        waypoints.get(i).getLongitude());
+            if (result != null) {
+                try {
+                    JSONObject directionsResultJson = new JSONObject(result);
+                    routeGeometry = directionsResultJson.getJSONArray("routes").getJSONObject(0).getString("geometry");
+                    positionList =  PolylineUtils.decode(routeGeometry, 5);
+
+                    // Convert Positions List into LatLng[]
+                    points = new LatLng[positionList.size()];
+                    for (int i = 0; i < positionList.size(); i++) {
+                        points[i] = new LatLng(
+                                positionList.get(i).getLatitude(),
+                                positionList.get(i).getLongitude());
+                    }
+                }
+                catch(JSONException ex) {
+                    ex.printStackTrace();
+                }
+
+
             }
 
         } catch (IOException e) {
