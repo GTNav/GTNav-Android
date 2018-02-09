@@ -1,10 +1,14 @@
 package com.spybug.gtnav;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.directions.DirectionsCriteria;
 import com.mapbox.directions.MapboxDirections;
@@ -42,8 +46,39 @@ public class MapServerRequest extends AsyncTask {
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
 
+    private Context context;
+
+    MapServerRequest(Context contextin) { context = contextin;}
+
     protected void onPreExecute() {
-        //TODO: cancel task if no internet
+        String info;
+        if (!haveNetworkConnection()) {
+            info = "You are not connected to the internet. Please try again later.";
+        } else {
+            info = "Getting directions from the server...";
+        }
+        Toast.makeText(context, info, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Determines if the client has a network connection
+     * @return a boolean representing whether or not the client has a connection
+     */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
     @Override

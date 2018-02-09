@@ -155,7 +155,7 @@ public class DirectionsFragment extends Fragment {
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                     try {
-                        final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
+                        final LatLng[] points = (LatLng[]) new MapServerRequest(getActivity()).execute(myView, getString(R.string.mapbox_key)).get();
                         drawPoints(points);
 
                         return true;
