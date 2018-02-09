@@ -1,12 +1,25 @@
 package com.spybug.gtnav;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
-import java.io.BufferedReader;
+import com.mapbox.directions.DirectionsCriteria;
+import com.mapbox.directions.MapboxDirections;
+import com.mapbox.directions.service.models.DirectionsResponse;
+import com.mapbox.directions.service.models.DirectionsRoute;
+import com.mapbox.directions.service.models.Waypoint;
+import com.mapbox.geocoder.MapboxGeocoder;
+import com.mapbox.geocoder.service.models.GeocoderFeature;
+import com.mapbox.geocoder.service.models.GeocoderResponse;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.List;
+
+import retrofit.Response;
 
 /**
  * Background task to communicate with the map server
@@ -25,45 +38,62 @@ public class MapServerRequest extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object... objects) {
-        String start = (String) objects[0];
-        String end = (String) objects[1];
-        String request = serverpath + "/directions/" + start + "," + end;
-        String result;
-        String inputLine;
-        try {
-            //Create a URL object holding our url
-            URL myUrl = new URL(request);
-            //Create a connection
-            HttpURLConnection connection =(HttpURLConnection)
-                    myUrl.openConnection();
-            //Set methods and timeouts
-            connection.setRequestMethod(REQUEST_METHOD);
-            connection.setReadTimeout(READ_TIMEOUT);
-            connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        View view = (View) objects[0];
+        String mapboxApiKey = (String) objects[1];
+        EditText startText = view.findViewById(R.id.start_location);
+        EditText endText = view.findViewById(R.id.end_location);
 
-            //Connect to our url
-            connection.connect();
-            //Create a new InputStreamReader
-            InputStreamReader streamReader = new
-                    InputStreamReader(connection.getInputStream());
-            //Create a new buffered reader and String Builder
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            //Check if the line we are reading is not null
-            while((inputLine = reader.readLine()) != null){
-                stringBuilder.append(inputLine);
+        LatLng[] points = new LatLng[0];
+        String start = startText.getText().toString();
+        String end = endText.getText().toString();
+
+
+        MapboxGeocoder geo_client1 = new MapboxGeocoder.Builder()
+                .setAccessToken(mapboxApiKey)
+                .setLocation(start)
+                .build();
+
+        MapboxGeocoder geo_client2 = new MapboxGeocoder.Builder()
+                .setAccessToken(mapboxApiKey)
+                .setLocation(end)
+                .build();
+
+        try {
+            Response<GeocoderResponse> geo_response_start = geo_client1.execute();
+            Response<GeocoderResponse> geo_response_end = geo_client2.execute();
+
+            GeocoderFeature start_result = geo_response_start.body().getFeatures().get(0);
+            GeocoderFeature end_result = geo_response_end.body().getFeatures().get(0);
+
+            Waypoint origin = new Waypoint(start_result.getLongitude(), start_result.getLatitude());
+            Waypoint destination = new Waypoint(end_result.getLongitude(), end_result.getLatitude());
+
+            MapboxDirections client = new MapboxDirections.Builder()
+                    .setAccessToken(mapboxApiKey)
+                    .setOrigin(origin)
+                    .setDestination(destination)
+                    .setProfile(DirectionsCriteria.PROFILE_WALKING)
+                    .build();
+
+            Response<DirectionsResponse> response = client.execute();
+            Log.v("Directions Result", "Getting directions successful!");
+
+            DirectionsRoute route = response.body().getRoutes().get(0);
+
+            // Convert Waypoints List into LatLng[]
+            List<Waypoint> waypoints = route.getGeometry().getWaypoints();
+            points = new LatLng[waypoints.size()];
+            for (int i = 0; i < waypoints.size(); i++) {
+                points[i] = new LatLng(
+                        waypoints.get(i).getLatitude(),
+                        waypoints.get(i).getLongitude());
             }
-            //Close our InputStream and Buffered reader
-            reader.close();
-            streamReader.close();
-            //Set our result equal to our stringBuilder
-            result = stringBuilder.toString();
-        }
-        catch(IOException e){
+
+        } catch (IOException e) {
             e.printStackTrace();
-            result = "Error Connecting";
         }
-        return result;
+
+        return points;
     }
 
     protected void onProgressUpdate(Object... values) {

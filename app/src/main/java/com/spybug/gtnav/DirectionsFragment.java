@@ -1,6 +1,13 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,13 +18,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
+import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
 
 
 /**
@@ -39,6 +56,9 @@ public class DirectionsFragment extends Fragment {
     private String mParam2;
 
     private MapView mapView;
+    private MapboxMap map;
+
+    private Icon start_icon, destination_icon;
 
     private OnFragmentInteractionListener mListener;
 
@@ -105,51 +125,79 @@ public class DirectionsFragment extends Fragment {
 
         final EditText startLocation = v.findViewById(R.id.start_location);
         final EditText endLocation = v.findViewById(R.id.end_location);
-        final String result[] = new String[1];
-        startLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                try {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        result[0] = (String) new MapServerRequest().execute(startLocation.getText().toString(),
-                                endLocation.getText().toString()).get();
-                        Log.d("Directions", result[0]);
-                        return true;
-                    }
-                    return false;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        });
-        endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                try {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        result[0] = (String) new MapServerRequest().execute(startLocation.getText().toString(),
-                                endLocation.getText().toString()).get();
-                        Log.d("Directions", result[0]);
-                        return true;
-                    }
-                    return false;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        });
+        final View myView = v;
+
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
-
+                map = mapboxMap;
             }
         });
 
+
+        Resources resources = getResources();
+        IconFactory iconFactory = IconFactory.getInstance(v.getContext());
+        Drawable startMarkerDrawable = resources.getDrawable(R.drawable.start_marker);
+
+        Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
+        start_icon = iconFactory.fromBitmap(start_marker_icon);
+        destination_icon = iconFactory.defaultMarker();
+
+        endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    //hide the keyboard
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                    try {
+                        final LatLng[] points = (LatLng[]) new MapServerRequest().execute(myView, getString(R.string.mapbox_key)).get();
+                        drawPoints(points);
+
+                        return true;
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
         return v;
+    }
+
+    public void drawPoints(LatLng[] points) {
+        map.clear();
+        //Draw Points on Map
+        map.addPolyline(new PolylineOptions()
+                .add(points)
+                .color(Color.parseColor("red"))
+                .width(5));
+
+        LatLng firstPoint = points[0];
+        LatLng lastPoint  = points[points.length - 1];
+
+        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                .include(firstPoint)
+                .include(lastPoint)
+                .build();
+
+        map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 250), 2500);
+
+        map.addMarker(new MarkerOptions()
+                .position(firstPoint)
+                .title("Start")
+                .icon(start_icon));
+
+        map.addMarker(new MarkerOptions()
+                .position(lastPoint)
+                .title("Destination")
+                .icon(destination_icon));
     }
 
     // TODO: Rename method, update argument and hook method into UI event
