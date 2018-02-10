@@ -27,11 +27,14 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
@@ -57,6 +60,11 @@ public class DirectionsFragment extends Fragment {
 
     private MapView mapView;
     private MapboxMap map;
+
+    private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
+            .include(new LatLng(33.753312, -84.421579))
+            .include(new LatLng(33.797474, -84.372656))
+            .build();
 
     private Icon start_icon, destination_icon;
 
@@ -127,13 +135,14 @@ public class DirectionsFragment extends Fragment {
         final EditText endLocation = v.findViewById(R.id.end_location);
         final View myView = v;
 
-        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
+                map.setLatLngBoundsForCameraTarget(GT_BOUNDS);
             }
         });
 
@@ -150,15 +159,19 @@ public class DirectionsFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if (startLocation.getText().length() == 0 || endLocation.getText().length() == 0) {
+                        return true;
+                    }
+
                     //hide the keyboard
                     InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                     try {
-                        final LatLng[] points = (LatLng[]) new MapServerRequest(getActivity()).execute(myView, getString(R.string.mapbox_key)).get();
+                        final LatLng[] points = (LatLng[]) new MapServerRequest(v.getContext()).execute(myView, getString(R.string.mapbox_key)).get();
                         drawPoints(points);
 
-                        return true;
+                        return false;
                     }
                     catch(Exception e) {
                         e.printStackTrace();

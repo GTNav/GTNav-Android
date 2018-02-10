@@ -10,16 +10,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mapbox.directions.DirectionsCriteria;
-import com.mapbox.directions.MapboxDirections;
-import com.mapbox.directions.service.models.DirectionsResponse;
-import com.mapbox.directions.service.models.DirectionsRoute;
-import com.mapbox.directions.service.models.Waypoint;
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.commons.utils.PolylineUtils;
 
@@ -29,66 +23,52 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
 import retrofit.Response;
 
+import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
+
+//import retrofit.Response;
+
 /**
  * Background task to communicate with the map server
  */
 
-public class MapServerRequest extends AsyncTask {
+public class MapServerRequest extends AsyncTask<Object, Void, Object> {
 
-    private static final String serverpath = "http://localhost:8080";
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
+    private WeakReference<Context> contextRef;
+    private boolean hasNetwork = true;
+    private int errorCode = 0;
 
-    private Context context;
-
-    MapServerRequest(Context contextin) { context = contextin;}
-
-    protected void onPreExecute() {
-        String info;
-        if (!haveNetworkConnection()) {
-            info = "You are not connected to the internet. Please try again later.";
-        } else {
-            info = "Getting directions from the server...";
-        }
-        Toast.makeText(context, info, Toast.LENGTH_LONG).show();
+    MapServerRequest(Context context) {
+        contextRef = new WeakReference<>(context);
     }
 
-    /**
-     * Determines if the client has a network connection
-     * @return a boolean representing whether or not the client has a connection
-     */
-    private boolean haveNetworkConnection() {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
-
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
-        for (NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
-                if (ni.isConnected())
-                    haveConnectedWifi = true;
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
-                if (ni.isConnected())
-                    haveConnectedMobile = true;
-        }
-        return haveConnectedWifi || haveConnectedMobile;
+    protected void onPreExecute() {
+        hasNetwork = haveNetworkConnection(contextRef.get());
     }
 
     @Override
-    protected Object doInBackground(Object... objects) {
+    protected Object doInBackground(Object[] objects) {
+        LatLng[] points = new LatLng[0];
+
+        if (!hasNetwork) {
+            errorCode = 1;
+            return points;
+        }
+
         View view = (View) objects[0];
         String mapboxApiKey = (String) objects[1];
         EditText startText = view.findViewById(R.id.start_location);
         EditText endText = view.findViewById(R.id.end_location);
 
-        LatLng[] points = new LatLng[0];
         String start = startText.getText().toString();
         String end = endText.getText().toString();
         String inputLine;
@@ -99,21 +79,34 @@ public class MapServerRequest extends AsyncTask {
         MapboxGeocoder geo_client1 = new MapboxGeocoder.Builder()
                 .setAccessToken(mapboxApiKey)
                 .setLocation(start)
+                .setProximity( -84.3963,33.7756)
                 .build();
 
         MapboxGeocoder geo_client2 = new MapboxGeocoder.Builder()
                 .setAccessToken(mapboxApiKey)
                 .setLocation(end)
+                .setProximity(-84.3963, 33.7756)
                 .build();
 
         try {
             Response<GeocoderResponse> geo_response_start = geo_client1.execute();
             Response<GeocoderResponse> geo_response_end = geo_client2.execute();
 
-            GeocoderFeature start_result = geo_response_start.body().getFeatures().get(0);
-            GeocoderFeature end_result = geo_response_end.body().getFeatures().get(0);
+            List<GeocoderFeature> start_results = geo_response_start.body().getFeatures();
+            List<GeocoderFeature> end_results = geo_response_end.body().getFeatures();
+            GeocoderFeature start_result, end_result;
 
-            stringUrl = String.format("https://gtnavtest.azurewebsites.net/directions?origin=%s,%s&destination=%s,%s&mode=%s",
+            if (start_results.size() == 0 || end_results.size() == 0) {
+                errorCode = 2;
+                return points;
+            }
+            else {
+                start_result = start_results.get(0);
+                end_result = end_results.get(0);
+            }
+
+            stringUrl = String.format("%sdirections?origin=%s,%s&destination=%s,%s&mode=%s",
+                    BuildConfig.API_URL,
                     start_result.getLongitude(), start_result.getLatitude(),
                     end_result.getLongitude(), end_result.getLatitude(),
                     "walking");
@@ -182,13 +175,15 @@ public class MapServerRequest extends AsyncTask {
         return points;
     }
 
-    protected void onProgressUpdate(Object... values) {
-        super.onProgressUpdate(values);
-    }
-
-    @Override
     protected void onPostExecute(Object result) {
-        super.onPostExecute(result);
+        if (errorCode != 0) {
+            if (errorCode == 1) {
+                String info = "You are not connected to the internet. Please try again later.";
+                Toast.makeText(contextRef.get(), info, Toast.LENGTH_LONG).show();
+            } else if (errorCode == 2) {
+                String info = "Could not find location, please try again.";
+                Toast.makeText(contextRef.get(), info, Toast.LENGTH_LONG).show();
+            }
+        }
     }
-
 }
