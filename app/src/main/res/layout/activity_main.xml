@@ -9,11 +9,40 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <FrameLayout
-        android:id="@+id/content_frame"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        >
+        <FrameLayout
+            android:id="@+id/directions_menu_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp">
+            <FrameLayout
+                android:id="@+id/map_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/map_overlay_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+            />
+        </RelativeLayout>
 
+        <FrameLayout
+            android:id="@+id/bottom_bar_frame"
+            android:layout_marginTop="-4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

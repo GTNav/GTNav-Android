@@ -1,5 +1,6 @@
 package com.spybug.gtnav;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,19 +18,73 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
+import com.mapbox.mapboxsdk.maps.UiSettings;
+
+import static com.spybug.gtnav.HelperUtil.convertDpToPixel;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private MapboxMap map;
+
+    private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
+            .include(new LatLng(33.753312, -84.421579))
+            .include(new LatLng(33.797474, -84.372656))
+            .build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Fragment newFragment = new MainFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, newFragment)
-                .commit();
+        SupportMapFragment mapFragment;
+        if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            LatLng GT = new LatLng(33.7756, -84.3963);
+
+            MapboxMapOptions options = new MapboxMapOptions();
+            options.styleUrl(Style.MAPBOX_STREETS);
+            options.camera(new CameraPosition.Builder()
+                    .target(GT)
+                    .zoom(14)
+                    .build());
+
+            mapFragment = SupportMapFragment.newInstance(options);
+            Fragment bottomBarFragment = new BottomNavbarFragment();
+            Fragment mainMapOverlayFragment = new MainMapOverlayFragment();
+
+            transaction.add(R.id.map_frame, mapFragment, "com.mapbox.map");
+            transaction.add(R.id.bottom_bar_frame, bottomBarFragment, "com.gtnav.bottomBar");
+            transaction.add(R.id.map_overlay_frame, mainMapOverlayFragment, "com.gtnav.mainMapOverlay");
+            transaction.commit();
+        } else {
+            mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
+        }
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                map = mapboxMap;
+                map.setMinZoomPreference(11);
+                UiSettings uiSettings = map.getUiSettings();
+                uiSettings.setTiltGesturesEnabled(false);
+                uiSettings.setCompassEnabled(true);
+
+                Context context = getBaseContext();
+                uiSettings.setCompassMargins(0, (int) convertDpToPixel(75, context), (int) convertDpToPixel(10, context), 0);
+
+                map.setLatLngBoundsForCameraTarget(GT_BOUNDS);
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -40,6 +95,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+            Fragment directionsMenu = new DirectionsMenuFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.directions_menu_frame, directionsMenu)
+                    .commit();
         } else {
             super.onBackPressed();
         }
@@ -93,24 +153,24 @@ public class MainActivity extends AppCompatActivity
             newFragment = new ScheduleFragment();
         }
 
-        try {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment curFragment = fragmentManager.findFragmentById(R.id.content_frame);
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-            //if its a new page, replace it
-            if (!curFragment.getClass().equals(newFragment.getClass())) {
-                fragmentTransaction.replace(R.id.content_frame, newFragment);
-                if (curFragment instanceof MainFragment) {
-                    fragmentTransaction.addToBackStack(null); //allow back button to lead back to MainFragment if leaving it
-                }
-                fragmentTransaction.commit();
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            Fragment curFragment = fragmentManager.findFragmentById(R.id.content_frame);
+//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//            //if its a new page, replace it
+//            if (!curFragment.getClass().equals(newFragment.getClass())) {
+//                fragmentTransaction.replace(R.id.content_frame, newFragment);
+//                if (curFragment instanceof MainFragment) {
+//                    fragmentTransaction.addToBackStack(null); //allow back button to lead back to MainFragment if leaving it
+//                }
+//                fragmentTransaction.commit();
+//            }
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         closeDrawer();
         return true;
@@ -128,7 +188,7 @@ public class MainActivity extends AppCompatActivity
         Fragment directionsFragment = new DirectionsFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, directionsFragment);
+        //fragmentTransaction.replace(R.id.content_frame, directionsFragment);
         if (addPrevToStack) {
             fragmentTransaction.addToBackStack(null);
         }
@@ -142,7 +202,7 @@ public class MainActivity extends AppCompatActivity
         Fragment busesFragment = new BusesFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, busesFragment);
+        //fragmentTransaction.replace(R.id.content_frame, busesFragment);
         if (addPrevToStack) {
                 fragmentTransaction.addToBackStack(null);
         }
@@ -156,7 +216,7 @@ public class MainActivity extends AppCompatActivity
         Fragment bikesFragment = new BikesFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, bikesFragment);
+        //fragmentTransaction.replace(R.id.content_frame, bikesFragment);
         if (addPrevToStack) {
             fragmentTransaction.addToBackStack(null);
         }

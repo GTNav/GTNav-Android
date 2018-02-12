@@ -1,26 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="com.spybug.gtnav.MainFragment">
+<RelativeLayout
+    android:id="@+id/directions_top_bar"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.spybug.gtnav.MainMapOverlayFragment">
 
-    <com.mapbox.mapboxsdk.maps.MapView android:id="@+id/mapView"
-                                       xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-                                       android:layout_width="match_parent"
-                                       android:layout_height="match_parent"
-                                       mapbox:mapbox_cameraTargetLat="33.7756"
-                                       mapbox:mapbox_cameraTargetLng="-84.3963"
-                                       mapbox:mapbox_cameraZoom="14"
-                                       mapbox:mapbox_cameraZoomMax="18"
-                                       mapbox:mapbox_cameraZoomMin="9"
-                                       mapbox:mapbox_myLocation="true"
-                                       mapbox:mapbox_uiCompass="true"
-                                       mapbox:mapbox_uiCompassMarginTop="75dp"
-                                       mapbox:mapbox_uiTiltGestures="false"
-        />
 
     <LinearLayout
         android:id="@+id/search_bar_layout"
