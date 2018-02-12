@@ -1,12 +1,15 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,8 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -27,13 +32,27 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerMode;
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
+import com.mapbox.services.android.telemetry.location.LostLocationEngine;
+import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+
+import java.util.List;
 
 import static com.spybug.gtnav.HelperUtil.convertDpToPixel;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener {
 
     private MapboxMap map;
+    private MapFragment mapFragment;
+    private PermissionsManager permissionsManager;
+    private LocationLayerPlugin locationPlugin;
+    private LocationEngine locationEngine;
 
     private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
             .include(new LatLng(33.753312, -84.421579))
@@ -45,7 +64,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mapFragment;
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -58,7 +76,7 @@ public class MainActivity extends AppCompatActivity
                     .zoom(14)
                     .build());
 
-            mapFragment = SupportMapFragment.newInstance(options);
+            mapFragment = MapFragment.newInstance(options);
             Fragment bottomBarFragment = new BottomNavbarFragment();
             Fragment mainMapOverlayFragment = new MainMapOverlayFragment();
 
@@ -67,7 +85,7 @@ public class MainActivity extends AppCompatActivity
             transaction.add(R.id.map_overlay_frame, mainMapOverlayFragment, "com.gtnav.mainMapOverlay");
             transaction.commit();
         } else {
-            mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
+            mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -83,6 +101,8 @@ public class MainActivity extends AppCompatActivity
                 uiSettings.setCompassMargins(0, (int) convertDpToPixel(75, context), (int) convertDpToPixel(10, context), 0);
 
                 map.setLatLngBoundsForCameraTarget(GT_BOUNDS);
+
+                enableLocationPlugin();
             }
         });
 
@@ -235,4 +255,102 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
+
+    @SuppressWarnings( {"MissingPermission"})
+    private void enableLocationPlugin() {
+        // Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            // Create an instance of LOST location engine
+            initializeLocationEngine();
+
+            locationPlugin = new LocationLayerPlugin(mapFragment.map, map, locationEngine);
+            locationPlugin.setLocationLayerEnabled(LocationLayerMode.TRACKING);
+        } else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(this);
+        }
+    }
+
+    @SuppressWarnings( {"MissingPermission"})
+    private void initializeLocationEngine() {
+        locationEngine = new LostLocationEngine(this);
+        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+        locationEngine.activate();
+
+        Location lastLocation = locationEngine.getLastLocation();
+        if (lastLocation != null) {
+            setCameraPosition(lastLocation);
+        } else {
+            locationEngine.addLocationEngineListener(this);
+        }
+    }
+
+    private void setCameraPosition(Location location) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(location.getLatitude(), location.getLongitude()), 16));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocationPlugin();
+        } else {
+            Toast.makeText(this, "You didn't grant location permissions.", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Override
+    @SuppressWarnings( {"MissingPermission"})
+    public void onConnected() {
+        locationEngine.requestLocationUpdates();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            setCameraPosition(location);
+            locationEngine.removeLocationEngineListener(this);
+        }
+    }
+
+    @Override
+    @SuppressWarnings( {"MissingPermission"})
+    protected void onStart() {
+        super.onStart();
+        if (locationPlugin != null) {
+            locationPlugin.onStart();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (locationEngine != null) {
+            locationEngine.removeLocationUpdates();
+        }
+        if (locationPlugin != null) {
+            locationPlugin.onStop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationEngine != null) {
+            locationEngine.deactivate();
+        }
+    }
+
 }
