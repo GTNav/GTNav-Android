@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.MenuInflater;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -39,7 +38,7 @@ import java.util.List;
 import static com.spybug.gtnav.HelperUtil.convertDpToPixel;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener, Communicator {
 
     private MapboxMap map;
     private MapFragment mapFragment;
@@ -84,8 +83,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
-
-
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -152,7 +149,7 @@ public class MainActivity extends AppCompatActivity
 
                 Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
                 fragmentTransaction.remove(overlayFragment);
-                fragmentTransaction.replace(R.id.directions_menu_frame, newFragment);
+                fragmentTransaction.replace(R.id.menu_frame, newFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
@@ -186,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void uncheckAllMenuItems() {
+    public void resetMainState() {
         Menu menu = navMenu.getMenu();
         if (navMenu != null) {
             for (int i = 0; i < menu.size(); i++) {
@@ -196,6 +193,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+
+        mapFragment.clearMap();
         currentState = State.MAIN;
     }
 
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity
             Fragment directionsMenuFragment = new DirectionsMenuFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.directions_menu_frame, directionsMenuFragment);
+            fragmentTransaction.replace(R.id.menu_frame, directionsMenuFragment);
             if (currentState == State.MAIN) {
                 Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
                 fragmentTransaction.remove(overlayFragment);
@@ -352,4 +351,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void passRouteToMap(LatLng[] points) {
+        mapFragment.drawDirectionsRoute(points);
+    }
 }

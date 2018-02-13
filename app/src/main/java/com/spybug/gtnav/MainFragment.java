@@ -107,7 +107,7 @@ public class MainFragment extends Fragment {
 //            }
 //        });
 //
-//        ((MainActivity) getActivity()).uncheckAllMenuItems();
+//        ((MainActivity) getActivity()).resetMainState();
 
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);

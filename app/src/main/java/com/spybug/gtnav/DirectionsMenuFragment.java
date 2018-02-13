@@ -4,9 +4,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 
 /**
@@ -18,16 +25,9 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class DirectionsMenuFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
+    private Communicator mCommunicator;
+    private EditText startLocation, endLocation;
 
     public DirectionsMenuFragment() {
         // Required empty public constructor
@@ -45,8 +45,6 @@ public class DirectionsMenuFragment extends Fragment {
     public static DirectionsMenuFragment newInstance(String param1, String param2) {
         DirectionsMenuFragment fragment = new DirectionsMenuFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,17 +52,46 @@ public class DirectionsMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_directions_menu, container, false);
+        View v = inflater.inflate(R.layout.fragment_directions_menu, container, false);
+
+        startLocation = v.findViewById(R.id.start_location);
+        endLocation = v.findViewById(R.id.end_location);
+        final View myView = v;
+
+        endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if (startLocation.getText().length() == 0 || endLocation.getText().length() == 0) {
+                        return true;
+                    }
+
+                    //hide the keyboard
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                    try {
+                        LatLng[] points = (LatLng[]) new MapServerRequest(v.getContext()).execute(myView, getString(R.string.mapbox_key)).get();
+                        ((Communicator) getActivity()).passRouteToMap(points);
+
+                        return false;
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+        });
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
