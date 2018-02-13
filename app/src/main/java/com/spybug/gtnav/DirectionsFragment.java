@@ -119,7 +119,7 @@ public class DirectionsFragment extends Fragment {
         busesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).openBusesFragment(false);
+                ((MainActivity) getActivity()).openBusesFragment();
             }
         });
 
@@ -127,7 +127,7 @@ public class DirectionsFragment extends Fragment {
         bikesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).openBikesFragment(false);
+                ((MainActivity) getActivity()).openBikesFragment();
             }
         });
 

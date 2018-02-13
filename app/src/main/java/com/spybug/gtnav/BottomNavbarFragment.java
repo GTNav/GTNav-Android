@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 
 /**
@@ -18,16 +19,9 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class BottomNavbarFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private ImageButton directionsButton, busesButton, bikesButton;
 
     public BottomNavbarFragment() {
         // Required empty public constructor
@@ -45,8 +39,6 @@ public class BottomNavbarFragment extends Fragment {
     public static BottomNavbarFragment newInstance(String param1, String param2) {
         BottomNavbarFragment fragment = new BottomNavbarFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,17 +46,39 @@ public class BottomNavbarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bottom_navbar, container, false);
+
+        View v = inflater.inflate(R.layout.fragment_bottom_navbar, container, false);
+
+        directionsButton = v.findViewById(R.id.directions_button);
+        directionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openDirectionsMenuFragment(); //opens directions page
+            }
+        });
+
+        busesButton = v.findViewById(R.id.buses_button);
+        busesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openBusesFragment(); //opens buses page
+            }
+        });
+
+        bikesButton = v.findViewById(R.id.bikes_button);
+        bikesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).openBikesFragment(); //opens bikes page
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -75,13 +75,13 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.content_main, container, false);
-        menuButton = v.findViewById(R.id.search_bar_menubutton);
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) getActivity()).openDrawer(); //opens the navigation drawer
-            }
-        });
+//        menuButton = v.findViewById(R.id.search_bar_menubutton);
+//        menuButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                ((MainActivity) getActivity()).openDrawer(); //opens the navigation drawer
+//            }
+//        });
 
 //        directionsButton = v.findViewById(R.id.directions_button);
 //        directionsButton.setOnClickListener(new View.OnClickListener() {
