@@ -38,7 +38,7 @@ import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
  * Background task to communicate with the map server
  */
 
-public class MapServerRequest extends AsyncTask<Object, Void, Object> {
+public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -47,7 +47,7 @@ public class MapServerRequest extends AsyncTask<Object, Void, Object> {
     private boolean hasNetwork = true;
     private int errorCode = 0;
 
-    MapServerRequest(Context context) {
+    DirectionsServerRequest(Context context) {
         contextRef = new WeakReference<>(context);
     }
 

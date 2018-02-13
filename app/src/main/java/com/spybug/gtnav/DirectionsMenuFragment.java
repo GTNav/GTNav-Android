@@ -76,7 +76,7 @@ public class DirectionsMenuFragment extends Fragment {
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                     try {
-                        LatLng[] points = (LatLng[]) new MapServerRequest(v.getContext()).execute(myView, getString(R.string.mapbox_key)).get();
+                        LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext()).execute(myView, getString(R.string.mapbox_key)).get();
                         ((Communicator) getActivity()).passRouteToMap(points);
 
                         return false;
