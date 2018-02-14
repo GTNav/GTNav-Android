@@ -5,100 +5,161 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/directionsBar"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingTop="5dp"
+    android:orientation="vertical"
     tools:context="com.spybug.gtnav.DirectionsMenuFragment">
 
-    <ImageButton
-        android:id="@+id/directions_back_button"
-        android:layout_width="50dp"
-        android:layout_height="45dp"
-        android:layout_marginEnd="10dp"
+    <LinearLayout
         android:background="@android:color/transparent"
-        android:paddingBottom="4dp"
-        android:paddingTop="4dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_arrow_back_black"
-        android:tint="#FFFFFF"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
+
+        <ImageButton
+            android:id="@+id/directions_back_button"
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="10dp"
+            android:background="@android:color/transparent"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_arrow_back_black"
+            android:tint="#FFFFFF"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="5dp"
+                    android:gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_start_location"
+                    android:tint="#FFFFFF"/>
+
+                <EditText
+                    android:id="@+id/start_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="20dp"
+                    android:background="@color/directionsBarEditText"
+                    android:hint="Enter start location"
+                    android:imeOptions="actionDone"
+                    android:paddingBottom="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="5dp"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="@color/directionsTextHint"
+                    android:textCursorDrawable="@drawable/white_color_cursor"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="5dp"
+                    android:gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_place"
+                    android:tint="#FFFFFF"/>
+
+                <EditText
+                    android:id="@+id/end_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="20dp"
+                    android:background="@color/directionsBarEditText"
+                    android:hint="Enter end location"
+                    android:imeOptions="actionDone"
+                    android:paddingBottom="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="5dp"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="@color/directionsTextHint"
+                    android:textCursorDrawable="@drawable/white_color_cursor"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:orientation="vertical">
+        android:layout_gravity="center"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="5dp"
-                android:gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_start_location"
-                android:tint="#FFFFFF"/>
-
-            <EditText
-                android:id="@+id/start_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="20dp"
-                android:background="@color/directionsBarEditText"
-                android:hint="Enter start location"
-                android:imeOptions="actionDone"
-                android:paddingBottom="5dp"
-                android:paddingEnd="5dp"
-                android:paddingStart="15dp"
-                android:paddingTop="5dp"
-                android:singleLine="true"
-                android:textColor="#FFFFFF"
-                android:textColorHint="@color/directionsTextHint"
-                android:textCursorDrawable="@drawable/white_color_cursor"
-                android:textSize="16sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="5dp"
-                android:gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_place"
-                android:tint="#FFFFFF"/>
-
-            <EditText
-                android:id="@+id/end_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="20dp"
-                android:background="@color/directionsBarEditText"
-                android:hint="Enter end location"
-                android:imeOptions="actionDone"
-                android:paddingBottom="5dp"
-                android:paddingEnd="5dp"
-                android:paddingStart="15dp"
-                android:paddingTop="5dp"
-                android:singleLine="true"
-                android:textColor="#FFFFFF"
-                android:textColorHint="@color/directionsTextHint"
-                android:textCursorDrawable="@drawable/white_color_cursor"
-                android:textSize="16sp"/>
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/mode_walking_button"
+                android:layout_gravity="center"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_person_walk_black"
+                android:tint="@color/white"
+                />
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/mode_buses_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_bus_black"
+                android:tint="@color/white"
+                android:layout_margin="5dp"
+                />
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/mode_biking_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_bike_black"
+                android:tint="@color/white"
+                android:layout_margin="5dp"
+                />
+        </FrameLayout>
     </LinearLayout>
 
 </LinearLayout>

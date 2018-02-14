@@ -1,6 +1,7 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -28,6 +30,12 @@ public class DirectionsMenuFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private Communicator mCommunicator;
     private EditText startLocation, endLocation;
+    private ImageButton walkingButton, busesButton, bikingButton;
+
+    private enum SelectedMode {WALKING, BUSES, BIKING};
+    private SelectedMode curSelectedMode;
+
+    private final int transparent = Color.argb(0,0,0,0);
 
     public DirectionsMenuFragment() {
         // Required empty public constructor
@@ -58,10 +66,49 @@ public class DirectionsMenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_directions_menu, container, false);
+        final View myView = v;
 
         startLocation = v.findViewById(R.id.start_location);
         endLocation = v.findViewById(R.id.end_location);
-        final View myView = v;
+        walkingButton = v.findViewById(R.id.mode_walking_button);
+        busesButton = v.findViewById(R.id.mode_buses_button);
+        bikingButton = v.findViewById(R.id.mode_biking_button);
+
+        curSelectedMode = SelectedMode.WALKING; //Default to walking, but should load from user prefs/last value
+        modeChanged(curSelectedMode);
+
+        View.OnClickListener modeClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageButton clickedButton = (ImageButton) view;
+                switch (clickedButton.getId()) {
+                    case R.id.mode_walking_button:
+                        if (curSelectedMode != SelectedMode.WALKING) {
+                            modeChanged(SelectedMode.WALKING);
+                            curSelectedMode = SelectedMode.WALKING;
+                        }
+                        break;
+                    case R.id.mode_buses_button:
+                        if (curSelectedMode != SelectedMode.BUSES) {
+                            modeChanged(SelectedMode.BUSES);
+                            curSelectedMode = SelectedMode.BUSES;
+                        }
+                        break;
+                    case R.id.mode_biking_button:
+                        if (curSelectedMode != SelectedMode.BIKING) {
+                            modeChanged(SelectedMode.BIKING);
+                            curSelectedMode = SelectedMode.BIKING;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+
+        walkingButton.setOnClickListener(modeClickListener);
+        busesButton.setOnClickListener(modeClickListener);
+        bikingButton.setOnClickListener(modeClickListener);
 
         endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
@@ -91,6 +138,9 @@ public class DirectionsMenuFragment extends Fragment {
                 }
             }
         });
+
+
+
         return v;
     }
 
@@ -110,6 +160,39 @@ public class DirectionsMenuFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    //Updates UI to select newMode
+    private void modeChanged(SelectedMode newMode) {
+        switch (newMode) {
+            case WALKING:
+                resetImageButton(bikingButton);
+                resetImageButton(busesButton);
+                focusImageButton(walkingButton);
+                break;
+            case BUSES:
+                resetImageButton(walkingButton);
+                resetImageButton(bikingButton);
+                focusImageButton(busesButton);
+                break;
+            case BIKING:
+                resetImageButton(walkingButton);
+                resetImageButton(busesButton);
+                focusImageButton(bikingButton);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void resetImageButton(ImageButton imageButton) {
+        imageButton.setBackgroundColor(transparent);
+        imageButton.setColorFilter(getResources().getColor(R.color.white));
+    }
+
+    private void focusImageButton(ImageButton imageButton) {
+        imageButton.setBackground(getResources().getDrawable(R.drawable.round_button_white));
+        imageButton.setColorFilter(getResources().getColor(R.color.directionsBar));
     }
 
     /**

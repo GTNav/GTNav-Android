@@ -9,4 +9,5 @@
     <color name="directionsBar">#00254c</color> <!-- GT Link hover -->
     <color name="directionsBarEditText">#1c5189</color>
     <color name="directionsTextHint">#b7ffffff</color>
+    <color name="white">#ffffff</color>
 </resources>
