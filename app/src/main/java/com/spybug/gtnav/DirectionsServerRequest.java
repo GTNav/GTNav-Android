@@ -70,8 +70,9 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
 
         String start = ((String) objects[0]).toLowerCase();
         String end = ((String) objects[1]).toLowerCase();
-        Location user_location = (Location) objects[2];
-        String mapboxApiKey = (String) objects[3];
+        String mode = ((String) objects[2]).toLowerCase();
+        Location user_location = (Location) objects[3];
+        String mapboxApiKey = (String) objects[4];
 
         String inputLine;
         String stringUrl;
@@ -170,7 +171,7 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
                     BuildConfig.API_URL,
                     origin,
                     destination,
-                    "walking");
+                    mode);
 
             try {
                 //Create a URL object holding our url

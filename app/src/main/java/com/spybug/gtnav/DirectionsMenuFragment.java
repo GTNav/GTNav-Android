@@ -34,7 +34,22 @@ public class DirectionsMenuFragment extends Fragment {
     private EditText startLocation, endLocation;
     private ImageButton walkingButton, busesButton, bikingButton;
 
-    private enum SelectedMode {WALKING, BUSES, BIKING};
+    private enum SelectedMode {
+        WALKING("walking"),
+        BUSES("driving"), //change to buses after bus routing setup
+        BIKING("cycling");
+
+        private final String text;
+
+        SelectedMode(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
     private SelectedMode curSelectedMode;
 
     private static final int transparent = Color.argb(0,0,0,0);
@@ -139,7 +154,11 @@ public class DirectionsMenuFragment extends Fragment {
 
                     try {
                         LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext())
-                                .execute(startLocation.getText().toString(), endLocation.getText().toString(), location, getString(R.string.mapbox_key))
+                                .execute(startLocation.getText().toString(),
+                                        endLocation.getText().toString(),
+                                        curSelectedMode.toString(),
+                                        location,
+                                        getString(R.string.mapbox_key))
                                 .get();
                         ((Communicator) getActivity()).passRouteToMap(points);
 
