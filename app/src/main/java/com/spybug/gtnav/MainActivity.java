@@ -278,7 +278,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setCameraPosition(Location location) {
+    protected Location getLastLocation() {
+        if (locationPlugin != null) {
+            return locationPlugin.getLastKnownLocation();
+        }
+        return null;
+    }
+
+    protected void setCameraPosition(Location location) {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), 16));
     }

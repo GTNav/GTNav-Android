@@ -1,6 +1,7 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.services.android.telemetry.constants.GeoConstants;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.commons.utils.PolylineUtils;
 
@@ -47,6 +49,8 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
     private boolean hasNetwork = true;
     private int errorCode = 0;
 
+    private enum UserLocationUsage {START, END, NONE}
+
     DirectionsServerRequest(Context context) {
         contextRef = new WeakReference<>(context);
     }
@@ -64,51 +68,108 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
             return points;
         }
 
-        View view = (View) objects[0];
-        String mapboxApiKey = (String) objects[1];
-        EditText startText = view.findViewById(R.id.start_location);
-        EditText endText = view.findViewById(R.id.end_location);
+        String start = ((String) objects[0]).toLowerCase();
+        String end = ((String) objects[1]).toLowerCase();
+        Location user_location = (Location) objects[2];
+        String mapboxApiKey = (String) objects[3];
 
-        String start = startText.getText().toString();
-        String end = endText.getText().toString();
         String inputLine;
         String stringUrl;
         String result;
         String routeGeometry;
+        UserLocationUsage userLocationUsage;
+        MapboxGeocoder geo_client_start = null;
+        MapboxGeocoder geo_client_end = null;
 
-        MapboxGeocoder geo_client1 = new MapboxGeocoder.Builder()
-                .setAccessToken(mapboxApiKey)
-                .setLocation(start)
-                .setProximity( -84.3963,33.7756)
-                .build();
+        String curLocationStr = "current location";
 
-        MapboxGeocoder geo_client2 = new MapboxGeocoder.Builder()
-                .setAccessToken(mapboxApiKey)
-                .setLocation(end)
-                .setProximity(-84.3963, 33.7756)
-                .build();
+        if (start.equals(curLocationStr) && end.equals(curLocationStr)) {
+            return points;
+        }
+        else if (start.equals(curLocationStr)) {
+            userLocationUsage = UserLocationUsage.START;
+        }
+        else if (end.equals(curLocationStr)) {
+            userLocationUsage = UserLocationUsage.END;
+        }
+        else {
+            userLocationUsage = UserLocationUsage.NONE;
+        }
+
+        if (userLocationUsage != UserLocationUsage.START) {
+            geo_client_start = new MapboxGeocoder.Builder()
+                    .setAccessToken(mapboxApiKey)
+                    .setLocation(start)
+                    .setProximity(-84.3963, 33.7756)
+                    .build();
+        }
+
+        if (userLocationUsage != UserLocationUsage.END) {
+            geo_client_end = new MapboxGeocoder.Builder()
+                    .setAccessToken(mapboxApiKey)
+                    .setLocation(end)
+                    .setProximity(-84.3963, 33.7756)
+                    .build();
+        }
 
         try {
-            Response<GeocoderResponse> geo_response_start = geo_client1.execute();
-            Response<GeocoderResponse> geo_response_end = geo_client2.execute();
+            Response<GeocoderResponse> geo_response_start = null;
+            Response<GeocoderResponse> geo_response_end = null;
+            List<GeocoderFeature> start_results, end_results;
 
-            List<GeocoderFeature> start_results = geo_response_start.body().getFeatures();
-            List<GeocoderFeature> end_results = geo_response_end.body().getFeatures();
-            GeocoderFeature start_result, end_result;
-
-            if (start_results.size() == 0 || end_results.size() == 0) {
-                errorCode = 2;
-                return points;
+            if (geo_client_start != null) {
+                geo_response_start = geo_client_start.execute();
             }
-            else {
+
+            if (geo_client_end != null) {
+                geo_response_end = geo_client_end.execute();
+            }
+
+            GeocoderFeature start_result = null;
+            GeocoderFeature end_result = null;
+
+            if (geo_client_start != null) {
+                start_results = geo_response_start.body().getFeatures();
+                if (start_results.size() == 0) {
+                    errorCode = 2;
+                    return points;
+                }
                 start_result = start_results.get(0);
+            }
+            if (geo_client_end != null) {
+                end_results = geo_response_end.body().getFeatures();
+                if (end_results.size() == 0) {
+                    errorCode = 2;
+                    return points;
+                }
                 end_result = end_results.get(0);
             }
 
-            stringUrl = String.format("%sdirections?origin=%s,%s&destination=%s,%s&mode=%s",
+            String origin = null;
+            String destination = null;
+
+            if (geo_response_start != null) {
+                origin = String.format("%s,%s",
+                        start_result.getLongitude(), start_result.getLatitude());
+            }
+            if (geo_response_end != null) {
+                destination = String.format("%s,%s",
+                        end_result.getLongitude(), end_result.getLatitude());
+            }
+
+            if (origin == null) {
+                origin = String.format("%s,%s",
+                        user_location.getLongitude(), user_location.getLatitude());
+            }
+            else if (destination == null) {
+                destination = String.format("%s,%s",
+                        user_location.getLongitude(), user_location.getLatitude());
+            }
+
+            stringUrl = String.format("%sdirections?origin=%s&destination=%s&mode=%s",
                     BuildConfig.API_URL,
-                    start_result.getLongitude(), start_result.getLatitude(),
-                    end_result.getLongitude(), end_result.getLatitude(),
+                    origin,
+                    destination,
                     "walking");
 
             try {

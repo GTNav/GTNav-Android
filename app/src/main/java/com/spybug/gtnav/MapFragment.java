@@ -96,7 +96,7 @@ public class MapFragment extends SupportMapFragment {
                     .include(lastPoint)
                     .build();
 
-            mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 250), 2500);
+            mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 175), 2000);
 
             mapboxMap.addMarker(new MarkerOptions()
                     .position(firstPoint)

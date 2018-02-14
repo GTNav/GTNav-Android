@@ -2,6 +2,7 @@ package com.spybug.gtnav;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
 
 
 /**
@@ -35,7 +37,7 @@ public class DirectionsMenuFragment extends Fragment {
     private enum SelectedMode {WALKING, BUSES, BIKING};
     private SelectedMode curSelectedMode;
 
-    private final int transparent = Color.argb(0,0,0,0);
+    private static final int transparent = Color.argb(0,0,0,0);
 
     public DirectionsMenuFragment() {
         // Required empty public constructor
@@ -74,6 +76,15 @@ public class DirectionsMenuFragment extends Fragment {
         busesButton = v.findViewById(R.id.mode_buses_button);
         bikingButton = v.findViewById(R.id.mode_biking_button);
 
+        //simulate back button being pressed
+        v.findViewById(R.id.directions_back_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).onBackPressed();
+            }
+        });
+
+
         curSelectedMode = SelectedMode.WALKING; //Default to walking, but should load from user prefs/last value
         modeChanged(curSelectedMode);
 
@@ -110,7 +121,9 @@ public class DirectionsMenuFragment extends Fragment {
         busesButton.setOnClickListener(modeClickListener);
         bikingButton.setOnClickListener(modeClickListener);
 
-        endLocation.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+        checkLocation();
+
+        EditText.OnEditorActionListener locationEditTextListener = new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -122,24 +135,27 @@ public class DirectionsMenuFragment extends Fragment {
                     InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
+                    Location location = ((MainActivity) getActivity()).getLastLocation();
+
                     try {
-                        LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext()).execute(myView, getString(R.string.mapbox_key)).get();
+                        LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext())
+                                .execute(startLocation.getText().toString(), endLocation.getText().toString(), location, getString(R.string.mapbox_key))
+                                .get();
                         ((Communicator) getActivity()).passRouteToMap(points);
 
                         return false;
-                    }
-                    catch(Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return false;
                     }
-                }
-                else {
+                } else {
                     return false;
                 }
             }
-        });
+        };
 
-
+        startLocation.setOnEditorActionListener(locationEditTextListener);
+        endLocation.setOnEditorActionListener(locationEditTextListener);
 
         return v;
     }
@@ -193,6 +209,23 @@ public class DirectionsMenuFragment extends Fragment {
     private void focusImageButton(ImageButton imageButton) {
         imageButton.setBackground(getResources().getDrawable(R.drawable.round_button_white));
         imageButton.setColorFilter(getResources().getColor(R.color.directionsBar));
+    }
+
+    private void checkLocation() {
+        Location lastLocation = ((MainActivity) getActivity()).getLastLocation();
+
+        if (lastLocation != null) {
+            startLocation.setText(getString(R.string.current_location));
+            ((MainActivity) getActivity()).setCameraPosition(lastLocation);
+            endLocation.requestFocus();
+            InputMethodManager imm = (InputMethodManager) (getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+        else {
+            startLocation.requestFocus();
+            InputMethodManager imm = (InputMethodManager) (getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
     }
 
     /**
