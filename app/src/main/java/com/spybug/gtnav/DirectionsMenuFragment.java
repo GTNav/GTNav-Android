@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
@@ -32,7 +33,6 @@ import com.mapbox.services.android.telemetry.location.LocationEngine;
  */
 public class DirectionsMenuFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
-    private Communicator mCommunicator;
     private EditText startLocation, endLocation;
     private ImageButton walkingButton, busesButton, bikingButton;
     private boolean directionsRequested = false;
@@ -200,25 +200,28 @@ public class DirectionsMenuFragment extends Fragment {
 
         if (endLocation != null && startLocation != null) {
             try {
-                LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext())
-                        .execute(startLocation.getText().toString(),
-                                endLocation.getText().toString(),
-                                curSelectedMode.toString(),
-                                location,
-                                getString(R.string.mapbox_key))
-                        .get();
-                ((Communicator) getActivity()).passRouteToMap(points);
+                DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<LatLng[], String>() {
+                    @Override
+                    public void onSuccess(LatLng[] points) {
+                        ((Communicator) getActivity()).passRouteToMap(points);
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        Toast.makeText(v.getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+                });
+                req.execute(startLocation.getText().toString(),
+                        endLocation.getText().toString(),
+                        curSelectedMode.toString(),
+                        location,
+                        getString(R.string.mapbox_key));
+
                 directionsRequested = true;
-            } catch (Exception e) {
+            }
+            catch(Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
         }
     }
 

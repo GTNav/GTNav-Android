@@ -2,20 +2,12 @@ package com.spybug.gtnav;
 
 import android.content.Context;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.commons.utils.PolylineUtils;
 
@@ -34,13 +26,11 @@ import retrofit.Response;
 
 import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
 
-//import retrofit.Response;
-
 /**
  * Background task to communicate with the map server
  */
 
-public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
+public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -48,11 +38,13 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
     private WeakReference<Context> contextRef;
     private boolean hasNetwork = true;
     private int errorCode = 0;
+    private OnEventListener<LatLng[], String> mCallBack;
 
     private enum UserLocationUsage {START, END, NONE}
 
-    DirectionsServerRequest(Context context) {
+    DirectionsServerRequest(Context context, OnEventListener<LatLng[], String> callback) {
         contextRef = new WeakReference<>(context);
+        mCallBack = callback;
     }
 
     protected void onPreExecute() {
@@ -60,7 +52,7 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
     }
 
     @Override
-    protected Object doInBackground(Object[] objects) {
+    protected LatLng[] doInBackground(Object[] objects) {
         LatLng[] points = new LatLng[0];
 
         if (!hasNetwork) {
@@ -207,13 +199,11 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
                 result = null;
             }
 
-            List<Position> positionList = null;
-
             if (result != null) {
                 try {
                     JSONObject directionsResultJson = new JSONObject(result);
                     routeGeometry = directionsResultJson.getJSONArray("routes").getJSONObject(0).getString("geometry");
-                    positionList =  PolylineUtils.decode(routeGeometry, 5);
+                    List<Position> positionList =  PolylineUtils.decode(routeGeometry, 5);
 
                     // Convert Positions List into LatLng[]
                     points = new LatLng[positionList.size()];
@@ -237,14 +227,19 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, Object> {
         return points;
     }
 
-    protected void onPostExecute(Object result) {
-        if (errorCode != 0) {
-            if (errorCode == 1) {
-                String info = "You are not connected to the internet. Please try again later.";
-                Toast.makeText(contextRef.get(), info, Toast.LENGTH_LONG).show();
-            } else if (errorCode == 2) {
-                String info = "Could not find location, please try again.";
-                Toast.makeText(contextRef.get(), info, Toast.LENGTH_LONG).show();
+    protected void onPostExecute(LatLng[] result) {
+        if (mCallBack != null) {
+            if (errorCode != 0) {
+                if (errorCode == 1) {
+                    String info = "You are not connected to the internet. Please try again later.";
+                    mCallBack.onFailure(info);
+                } else if (errorCode == 2) {
+                    String info = "Could not find location, please try again.";
+                    mCallBack.onFailure(info);
+                }
+            }
+            else {
+                mCallBack.onSuccess(result);
             }
         }
     }
