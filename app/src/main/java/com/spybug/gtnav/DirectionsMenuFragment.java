@@ -6,6 +6,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,8 @@ public class DirectionsMenuFragment extends Fragment {
     private Communicator mCommunicator;
     private EditText startLocation, endLocation;
     private ImageButton walkingButton, busesButton, bikingButton;
+    private boolean directionsRequested = false;
+    private View v;
 
     private enum SelectedMode {
         WALKING("walking"),
@@ -82,7 +86,7 @@ public class DirectionsMenuFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_directions_menu, container, false);
+        v = inflater.inflate(R.layout.fragment_directions_menu, container, false);
         final View myView = v;
 
         startLocation = v.findViewById(R.id.start_location);
@@ -112,18 +116,27 @@ public class DirectionsMenuFragment extends Fragment {
                         if (curSelectedMode != SelectedMode.WALKING) {
                             modeChanged(SelectedMode.WALKING);
                             curSelectedMode = SelectedMode.WALKING;
+                            if (directionsRequested) {
+                                makeDirectionsRequest();
+                            }
                         }
                         break;
                     case R.id.mode_buses_button:
                         if (curSelectedMode != SelectedMode.BUSES) {
                             modeChanged(SelectedMode.BUSES);
                             curSelectedMode = SelectedMode.BUSES;
+                            if (directionsRequested) {
+                                makeDirectionsRequest();
+                            }
                         }
                         break;
                     case R.id.mode_biking_button:
                         if (curSelectedMode != SelectedMode.BIKING) {
                             modeChanged(SelectedMode.BIKING);
                             curSelectedMode = SelectedMode.BIKING;
+                            if (directionsRequested) {
+                                makeDirectionsRequest();
+                            }
                         }
                         break;
                     default:
@@ -147,36 +160,59 @@ public class DirectionsMenuFragment extends Fragment {
                     }
 
                     //hide the keyboard
-                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) myView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-                    Location location = ((MainActivity) getActivity()).getLastLocation();
-
-                    try {
-                        LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext())
-                                .execute(startLocation.getText().toString(),
-                                        endLocation.getText().toString(),
-                                        curSelectedMode.toString(),
-                                        location,
-                                        getString(R.string.mapbox_key))
-                                .get();
-                        ((Communicator) getActivity()).passRouteToMap(points);
-
-                        return false;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return false;
+                    if (!directionsRequested) {
+                        makeDirectionsRequest();
                     }
+                    return false;
                 } else {
                     return false;
                 }
+
             }
         };
 
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    directionsRequested = (count - before == 0) && directionsRequested;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        };
+
         startLocation.setOnEditorActionListener(locationEditTextListener);
+        startLocation.addTextChangedListener(textWatcher);
         endLocation.setOnEditorActionListener(locationEditTextListener);
+        endLocation.addTextChangedListener(textWatcher);
 
         return v;
+    }
+
+    private void makeDirectionsRequest() {
+        Location location = ((MainActivity) getActivity()).getLastLocation();
+
+        if (endLocation != null && startLocation != null) {
+            try {
+                LatLng[] points = (LatLng[]) new DirectionsServerRequest(v.getContext())
+                        .execute(startLocation.getText().toString(),
+                                endLocation.getText().toString(),
+                                curSelectedMode.toString(),
+                                location,
+                                getString(R.string.mapbox_key))
+                        .get();
+                ((Communicator) getActivity()).passRouteToMap(points);
+                directionsRequested = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
