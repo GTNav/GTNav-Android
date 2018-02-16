@@ -106,9 +106,11 @@ public class MainActivity extends AppCompatActivity
         navMenu.setNavigationItemSelectedListener(this);
     }
 
+
+    //TODO: Currently memory leak exists with busmapoverlay fragment staying alive because of fragment manager backstack, so it keeps requesting bus update
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -148,9 +150,10 @@ public class MainActivity extends AppCompatActivity
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+                Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
                 fragmentTransaction.remove(overlayFragment);
-                fragmentTransaction.replace(R.id.menu_frame, newFragment);
-                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.remove(menuFragment);
+                fragmentTransaction.add(R.id.menu_frame, newFragment).addToBackStack(null);
                 fragmentTransaction.commit();
             }
         }
@@ -175,12 +178,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
         if (menuFragment != null) {
-            fragmentManager.beginTransaction()
-                    .remove(menuFragment)
-                    .commit();
+            fragmentTransaction.remove(menuFragment);
         }
+
         mapFragment.clearMap();
         currentState = State.MAIN;
     }
@@ -190,33 +193,43 @@ public class MainActivity extends AppCompatActivity
             Fragment fragment = new DirectionsMenuFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            //Place the directions menu in place of whats there (if anything at all)
             fragmentTransaction.replace(R.id.menu_frame, fragment);
+            //Remove any map overlays
+            Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            fragmentTransaction.remove(overlayFragment);
+            //Add main overlay to back stack
             if (currentState == State.MAIN) {
-                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-                fragmentTransaction.remove(overlayFragment);
                 fragmentTransaction.addToBackStack(null);
             }
             fragmentTransaction.commit();
-            currentState = State.DIRECTIONS;
 
+            mapFragment.clearMap();
+            currentState = State.DIRECTIONS;
             navMenu.setCheckedItem(R.id.nav_directions);
         }
     }
 
     public void openBusesFragment() {
         if (currentState != State.BUSES) {
-            Fragment fragment = new ScheduleFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.menu_frame, fragment);
+            //Remove any menu fragments on the buses page
+            Fragment menu_fragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (menu_fragment != null) {
+                fragmentTransaction.remove(menu_fragment);
+            }
+            //Place the buses map overlay in place of whats there (if anything at all)
+            Fragment fragment = new BusMapOverlayFragment();
+            fragmentTransaction.replace(R.id.map_overlay_frame, fragment);
+            //Place the main map overlay on the back stack
             if (currentState == State.MAIN) {
-                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-                fragmentTransaction.remove(overlayFragment);
                 fragmentTransaction.addToBackStack(null);
             }
             fragmentTransaction.commit();
-            currentState = State.BUSES;
 
+            mapFragment.clearMap();
+            currentState = State.BUSES;
             navMenu.setCheckedItem(R.id.nav_buses);
         }
     }
@@ -356,5 +369,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void passRouteToMap(LatLng[] points) {
         mapFragment.drawDirectionsRoute(points);
+    }
+
+    @Override
+    public void passBusRouteToMap(List<LatLng> points, String routeColor) {
+        mapFragment.drawBusesRoute(points, routeColor);
+    }
+
+    @Override
+    public void passBusLocationsToMap(List<LatLng> points, String routeColor) {
+        mapFragment.drawBusLocations(points, routeColor);
     }
 }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -36,7 +37,9 @@ public class MapFragment extends SupportMapFragment {
     private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
     public MapView map;
     private MapboxMap mapboxMap;
-    private Icon start_icon, destination_icon;
+    private Icon start_icon, destination_icon, bus_icon;
+    private List<Marker> busMarkers;
+
     /**
      * Creates the fragment view hierarchy.
      *
@@ -56,6 +59,9 @@ public class MapFragment extends SupportMapFragment {
         Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
+        bus_icon = iconFactory.defaultMarker();
+
+        busMarkers = new ArrayList<Marker>();
 
         return map;
     }
@@ -107,6 +113,31 @@ public class MapFragment extends SupportMapFragment {
                     .position(lastPoint)
                     .title("Destination")
                     .icon(destination_icon));
+        }
+    }
+
+    public void drawBusesRoute(List<LatLng> points, String routeColor) {
+        mapboxMap.addPolyline(new PolylineOptions()
+                .addAll(points)
+                .color(Color.parseColor(routeColor))
+                .width(4));
+
+        LatLngBounds routeBounds = new LatLngBounds.Builder()
+                .includes(points)
+                .build();
+
+        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, 100));
+    }
+
+    public void drawBusLocations(List<LatLng> buses, String routeColor) {
+        //TODO: update the list of markers if they are in the list, otherwise create new one
+        mapboxMap.removeAnnotations(busMarkers); //removed markers
+
+        for (LatLng bus : buses) {
+            Marker newMarker = mapboxMap.addMarker(new MarkerOptions()
+                .position(bus)
+                .icon(bus_icon));
+            busMarkers.add(newMarker);
         }
     }
 
