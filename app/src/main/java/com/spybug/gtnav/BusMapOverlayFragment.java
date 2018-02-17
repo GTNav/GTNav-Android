@@ -1,20 +1,24 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -32,6 +36,12 @@ public class BusMapOverlayFragment extends Fragment {
     private View view;
     private Handler handler;
     private final int busDelayms = 15000; //15 seconds
+
+    private boolean fabExpanded = false;
+    private FloatingActionButton fabSelect;
+    private LinearLayout layoutFabBlue, layoutFabRed, layoutFabGreen, layoutFabTrolley, layoutFabMidnight, layoutFabExpress;
+    private enum CurrentRoute {RED, BLUE, GREEN, TROLLEY, MIDNIGHT, EXPRESS}
+    private CurrentRoute currentRoute;
 
     public BusMapOverlayFragment() {
         // Required empty public constructor
@@ -76,6 +86,73 @@ public class BusMapOverlayFragment extends Fragment {
             }
         }).execute();
 
+        fabSelect = view.findViewById(R.id.fabSelect);
+        FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial
+
+        List<FloatingActionButton> fabButtons = new LinkedList<>();
+        fabButtons.add((FloatingActionButton) fabRed);
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabBlue));
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabGreen));
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabMidnight));
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabExpress));
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabTrolley));
+
+        layoutFabBlue = view.findViewById(R.id.layoutFabBlue);
+        layoutFabRed = view.findViewById(R.id.layoutFabRed);
+        layoutFabGreen = view.findViewById(R.id.layoutFabGreen);
+        layoutFabTrolley = view.findViewById(R.id.layoutFabTrolley);
+        layoutFabMidnight = view.findViewById(R.id.layoutFabMidnight);
+        layoutFabExpress = view.findViewById(R.id.layoutFabExpress);
+
+        View.OnClickListener fabColorOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final FloatingActionButton fabView = (FloatingActionButton) view;
+                final int fabId = fabView.getId();
+                switch(fabId) {
+                    case R.id.fabBlue:
+                        currentRoute = CurrentRoute.BLUE;
+                        break;
+                    case R.id.fabRed:
+                        currentRoute = CurrentRoute.RED;
+                        break;
+                    case R.id.fabGreen:
+                        currentRoute = CurrentRoute.GREEN;
+                        break;
+                    case R.id.fabTrolley:
+                        currentRoute = CurrentRoute.TROLLEY;
+                        break;
+                    case R.id.fabMidnight:
+                        currentRoute = CurrentRoute.MIDNIGHT;
+                        break;
+                    case R.id.fabExpress:
+                        currentRoute = CurrentRoute.EXPRESS;
+                        break;
+                    default:
+                        break;
+                }
+                closeSubMenusFab(fabView.getBackgroundTintList());
+            }
+        };
+
+        for (FloatingActionButton fab : fabButtons) {
+            fab.setOnClickListener(fabColorOnClickListener);
+        }
+
+        fabSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fabExpanded){
+                    closeSubMenusFab(ColorStateList.valueOf(Color.parseColor("#ffffff")));
+                } else {
+                    openSubMenusFab();
+                }
+            }
+        });
+
+        currentRoute = CurrentRoute.RED; //Default route, will be set based on saved last viewed route later
+        closeSubMenusFab(fabRed.getBackgroundTintList());
+
         return view;
     }
 
@@ -102,6 +179,32 @@ public class BusMapOverlayFragment extends Fragment {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
         }).execute(fRouteColor);
+    }
+
+    //closes FAB submenus
+    private void closeSubMenusFab(ColorStateList routeColor){
+        layoutFabBlue.setVisibility(View.INVISIBLE);
+        layoutFabRed.setVisibility(View.INVISIBLE);
+        layoutFabGreen.setVisibility(View.INVISIBLE);
+        layoutFabTrolley.setVisibility(View.INVISIBLE);
+        layoutFabMidnight.setVisibility(View.INVISIBLE);
+        layoutFabExpress.setVisibility(View.INVISIBLE);
+        fabSelect.setBackgroundTintList(routeColor);
+        fabSelect.setImageResource(R.drawable.ic_bus_black);
+        fabExpanded = false;
+    }
+
+    //Opens FAB submenus
+    private void openSubMenusFab(){
+        layoutFabBlue.setVisibility(View.VISIBLE);
+        layoutFabRed.setVisibility(View.VISIBLE);
+        layoutFabGreen.setVisibility(View.VISIBLE);
+        layoutFabTrolley.setVisibility(View.VISIBLE);
+        layoutFabMidnight.setVisibility(View.VISIBLE);
+        layoutFabExpress.setVisibility(View.VISIBLE);
+        fabSelect.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#ffffff")));
+        fabSelect.setImageResource(R.drawable.ic_close_black);
+        fabExpanded = true;
     }
 
     @Override

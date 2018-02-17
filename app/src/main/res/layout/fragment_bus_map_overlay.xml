@@ -8,19 +8,21 @@
     tools:context="com.spybug.gtnav.MainMapOverlayFragment">
 
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/round_report_button"
-        android:padding="11dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_bus_black"
-        android:tint="#FFFFFF"/>
+    <include layout="@layout/bus_fab_submenu"/>
+
+    <!--<ImageButton-->
+        <!--android:id="@+id/imageButton"-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_marginBottom="20dp"-->
+        <!--android:layout_marginEnd="15dp"-->
+        <!--android:background="@drawable/round_report_button"-->
+        <!--android:padding="11dp"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--android:src="@drawable/ic_bus_black"-->
+        <!--android:tint="#FFFFFF"/>-->
 
 
 </RelativeLayout>
