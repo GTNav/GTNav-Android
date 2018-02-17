@@ -276,13 +276,9 @@ public class DirectionsMenuFragment extends Fragment {
             startLocation.setText(getString(R.string.current_location));
             ((MainActivity) getActivity()).setCameraPosition(lastLocation);
             endLocation.requestFocus();
-            InputMethodManager imm = (InputMethodManager) (getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
         else {
             startLocation.requestFocus();
-            InputMethodManager imm = (InputMethodManager) (getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
     }
 

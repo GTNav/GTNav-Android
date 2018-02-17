@@ -45,7 +45,6 @@ public class BusMapOverlayFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment DirectionsFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static BusMapOverlayFragment newInstance(String param1, String param2) {
         BusMapOverlayFragment fragment = new BusMapOverlayFragment();
         Bundle args = new Bundle();
@@ -162,7 +161,6 @@ public class BusMapOverlayFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }
