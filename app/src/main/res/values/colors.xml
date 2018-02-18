@@ -10,4 +10,11 @@
     <color name="directionsBarEditText">#1c5189</color>
     <color name="directionsTextHint">#b7ffffff</color>
     <color name="white">#ffffff</color>
+
+    <color name="blueRoute">#0008FF</color>
+    <color name="redRoute">#FF0000</color>
+    <color name="greenRoute">#1BFF00</color>
+    <color name="techTrolley">#FFDC00</color>
+    <color name="techExpress">#FFF000</color>
+    <color name="midnightRambler">#7000CD</color>
 </resources>

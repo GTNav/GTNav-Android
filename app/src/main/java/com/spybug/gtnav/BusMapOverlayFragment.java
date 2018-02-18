@@ -89,7 +89,7 @@ public class BusMapOverlayFragment extends Fragment {
         fabSelect = view.findViewById(R.id.fabSelect);
         FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial
 
-        List<FloatingActionButton> fabButtons = new LinkedList<>();
+        final List<FloatingActionButton> fabButtons = new LinkedList<>();
         fabButtons.add((FloatingActionButton) fabRed);
         fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabBlue));
         fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabGreen));
@@ -143,7 +143,30 @@ public class BusMapOverlayFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (fabExpanded){
-                    closeSubMenusFab(ColorStateList.valueOf(Color.parseColor("#ffffff")));
+                    ColorStateList color = ColorStateList.valueOf(Color.parseColor("#ffffff"));
+                    switch(currentRoute) {
+                        case BLUE:
+                            color = fabButtons.get(1).getBackgroundTintList();
+                            break;
+                        case RED:
+                            color = fabButtons.get(0).getBackgroundTintList();
+                            break;
+                        case GREEN:
+                            color = fabButtons.get(2).getBackgroundTintList();
+                            break;
+                        case TROLLEY:
+                            color = fabButtons.get(3).getBackgroundTintList();
+                            break;
+                        case MIDNIGHT:
+                            color = fabButtons.get(4).getBackgroundTintList();
+                            break;
+                        case EXPRESS:
+                            color = fabButtons.get(5).getBackgroundTintList();
+                            break;
+                        default:
+                            break;
+                    }
+                    closeSubMenusFab(color);
                 } else {
                     openSubMenusFab();
                 }

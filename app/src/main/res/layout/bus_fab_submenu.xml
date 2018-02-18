@@ -19,7 +19,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="110dp"
+        android:layout_marginBottom="60dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_blue_dark"
+            app:backgroundTint="@color/blueRoute"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -60,7 +60,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="100dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -89,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_red_dark"
+            app:backgroundTint="@color/redRoute"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -101,7 +101,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="190dp"
+        android:layout_marginBottom="140dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -130,7 +130,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_green_dark"
+            app:backgroundTint="@color/greenRoute"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -142,7 +142,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="230dp"
+        android:layout_marginBottom="180dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -171,7 +171,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_orange_light"
+            app:backgroundTint="@color/techTrolley"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -183,7 +183,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="270dp"
+        android:layout_marginBottom="220dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -212,7 +212,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_purple"
+            app:backgroundTint="@color/midnightRambler"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -224,7 +224,7 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="310dp"
+        android:layout_marginBottom="260dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal">
 
@@ -253,7 +253,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bus_black"
-            app:backgroundTint="@android:color/holo_orange_dark"
+            app:backgroundTint="@color/techExpress"
             app:fabSize="mini" />
 
     </LinearLayout>
@@ -264,7 +264,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="2dp"
         android:orientation="horizontal">
 
         <android.support.design.widget.FloatingActionButton
