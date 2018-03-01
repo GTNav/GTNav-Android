@@ -116,17 +116,19 @@ public class MapFragment extends SupportMapFragment {
         }
     }
 
-    public void drawBusesRoute(List<LatLng> points, String routeColor) {
-        mapboxMap.addPolyline(new PolylineOptions()
-                .addAll(points)
-                .color(Color.parseColor(routeColor))
-                .width(4));
+    public void drawBusesRoute(List<List<LatLng>> points, String routeColor) {
+        LatLngBounds.Builder routeBounds = new LatLngBounds.Builder();
 
-        LatLngBounds routeBounds = new LatLngBounds.Builder()
-                .includes(points)
-                .build();
+        for (List<LatLng> pointList : points) {
+            mapboxMap.addPolyline(new PolylineOptions()
+                    .addAll(pointList)
+                    .color(Color.parseColor(routeColor))
+                    .width(4));
 
-        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, 100));
+            routeBounds.includes(pointList);
+        }
+
+        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds.build(), 100));
     }
 
     public void drawBusLocations(List<LatLng> buses, String routeColor) {

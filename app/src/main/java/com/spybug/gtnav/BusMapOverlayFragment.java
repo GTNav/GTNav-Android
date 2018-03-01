@@ -72,19 +72,19 @@ public class BusMapOverlayFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bus_map_overlay, container, false);
 
-        final String routeColor = "red";
+        final String routeName = "red";
 
-        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<LatLng>, String>() {
+        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
             @Override
-            public void onSuccess(List<LatLng> route) {
-                ((Communicator) getActivity()).passBusRouteToMap(route, routeColor);
+            public void onSuccess(List<List<LatLng>> route) {
+                ((Communicator) getActivity()).passBusRouteToMap(route, routeName);
             }
 
             @Override
             public void onFailure(String message) {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
-        }).execute();
+        }).execute(routeName);
 
         fabSelect = view.findViewById(R.id.fabSelect);
         FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial

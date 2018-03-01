@@ -6,7 +6,7 @@ import java.util.List;
 public interface Communicator {
     public void passRouteToMap(LatLng[] points);
 
-    public void passBusRouteToMap(List<LatLng> points, String routeColor);
+    public void passBusRouteToMap(List<List<LatLng>> points, String routeColor);
 
     public void passBusLocationsToMap(List<LatLng> buses, String routeColor);
 }

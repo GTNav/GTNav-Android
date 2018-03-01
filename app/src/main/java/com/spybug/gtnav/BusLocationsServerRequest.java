@@ -7,7 +7,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import java.util.List;
 
 import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
 
-//import retrofit.Response;
 
 /**
  * Background task to communicate with the map server

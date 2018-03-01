@@ -372,7 +372,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void passBusRouteToMap(List<LatLng> points, String routeColor) {
+    public void passBusRouteToMap(List<List<LatLng>> points, String routeColor) {
         mapFragment.drawBusesRoute(points, routeColor);
     }
 
