@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -39,6 +40,7 @@ public class MapFragment extends SupportMapFragment {
     private MapboxMap mapboxMap;
     private Icon start_icon, destination_icon, bus_icon;
     private List<Marker> busMarkers;
+    private List<Polyline> busRoutes;
 
     /**
      * Creates the fragment view hierarchy.
@@ -61,7 +63,8 @@ public class MapFragment extends SupportMapFragment {
         destination_icon = iconFactory.defaultMarker();
         bus_icon = iconFactory.defaultMarker();
 
-        busMarkers = new ArrayList<Marker>();
+        busMarkers = new ArrayList<>();
+        busRoutes = new ArrayList<>();
 
         return map;
     }
@@ -117,13 +120,20 @@ public class MapFragment extends SupportMapFragment {
     }
 
     public void drawBusesRoute(List<List<LatLng>> points, String routeColor) {
+        if (busRoutes.size() > 0) {
+            for (Polyline route : busRoutes) {
+                route.remove();
+            }
+        }
+
         LatLngBounds.Builder routeBounds = new LatLngBounds.Builder();
 
         for (List<LatLng> pointList : points) {
-            mapboxMap.addPolyline(new PolylineOptions()
+            busRoutes.add(mapboxMap.addPolyline(new PolylineOptions()
                     .addAll(pointList)
                     .color(Color.parseColor(routeColor))
-                    .width(4));
+                    .alpha(0.8f)
+                    .width(4)));
 
             routeBounds.includes(pointList);
         }

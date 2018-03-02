@@ -40,31 +40,36 @@ public class BusMapOverlayFragment extends Fragment {
     private boolean fabExpanded = false;
     private FloatingActionButton fabSelect;
     private LinearLayout layoutFabBlue, layoutFabRed, layoutFabGreen, layoutFabTrolley, layoutFabMidnight, layoutFabExpress;
-    private enum CurrentRoute {RED, BLUE, GREEN, TROLLEY, MIDNIGHT, EXPRESS}
+
+    private enum CurrentRoute {
+        RED("red"),
+        BLUE("blue"),
+        GREEN("green"),
+        TROLLEY("trolley"),
+        MIDNIGHT("night"),
+        EXPRESS("tech");
+
+        private final String text;
+
+        CurrentRoute(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
     private CurrentRoute currentRoute;
 
     public BusMapOverlayFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DirectionsFragment.
-     */
-    public static BusMapOverlayFragment newInstance(String param1, String param2) {
-        BusMapOverlayFragment fragment = new BusMapOverlayFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentRoute = CurrentRoute.RED; //default
     }
 
     @Override
@@ -72,19 +77,7 @@ public class BusMapOverlayFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bus_map_overlay, container, false);
 
-        final String routeName = "red";
-
-        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
-            @Override
-            public void onSuccess(List<List<LatLng>> route) {
-                ((Communicator) getActivity()).passBusRouteToMap(route, routeName);
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
-            }
-        }).execute(routeName);
+        getBusRoute(currentRoute.toString());
 
         fabSelect = view.findViewById(R.id.fabSelect);
         FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial
@@ -109,6 +102,8 @@ public class BusMapOverlayFragment extends Fragment {
             public void onClick(View view) {
                 final FloatingActionButton fabView = (FloatingActionButton) view;
                 final int fabId = fabView.getId();
+
+                CurrentRoute prevRoute = currentRoute;
                 switch(fabId) {
                     case R.id.fabBlue:
                         currentRoute = CurrentRoute.BLUE;
@@ -132,6 +127,13 @@ public class BusMapOverlayFragment extends Fragment {
                         break;
                 }
                 closeSubMenusFab(fabView.getBackgroundTintList());
+                //if user changed current route
+                if (prevRoute != currentRoute) {
+                    handler.removeCallbacks(busUpdater);
+                    getBusRoute(currentRoute.toString());
+                    getBusLocations(currentRoute.toString());
+                    handler.postDelayed(busUpdater, busDelayms);
+                }
             }
         };
 
@@ -145,11 +147,11 @@ public class BusMapOverlayFragment extends Fragment {
                 if (fabExpanded){
                     ColorStateList color = ColorStateList.valueOf(Color.parseColor("#ffffff"));
                     switch(currentRoute) {
-                        case BLUE:
-                            color = fabButtons.get(1).getBackgroundTintList();
-                            break;
                         case RED:
                             color = fabButtons.get(0).getBackgroundTintList();
+                            break;
+                        case BLUE:
+                            color = fabButtons.get(1).getBackgroundTintList();
                             break;
                         case GREEN:
                             color = fabButtons.get(2).getBackgroundTintList();
@@ -182,26 +184,42 @@ public class BusMapOverlayFragment extends Fragment {
     private Runnable busUpdater = new Runnable() {
         @Override
         public void run() {
-            getBusLocations("red");
+            getBusLocations(currentRoute.toString());
             //Toast.makeText(view.getContext(), "Making bus request", Toast.LENGTH_SHORT).show(); //For debugging to tell when bus location updated
             handler.postDelayed(busUpdater, busDelayms);
         }
     };
 
-    private void getBusLocations(String routeColor) {
-        final String fRouteColor = routeColor;
+    private void getBusLocations(String routeName) {
+        final String fRouteName = routeName;
 
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<LatLng>, String>() {
             @Override
             public void onSuccess(List<LatLng> buses) {
-                ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteColor);
+                ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteName);
             }
 
             @Override
             public void onFailure(String message) {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
-        }).execute(fRouteColor);
+        }).execute(fRouteName);
+    }
+
+    private void getBusRoute(String routeName) {
+        final String fRouteName = routeName;
+
+        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
+            @Override
+            public void onSuccess(List<List<LatLng>> route) {
+                ((Communicator) getActivity()).passBusRouteToMap(route, fRouteName);
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        }).execute(fRouteName);
     }
 
     //closes FAB submenus
@@ -272,7 +290,7 @@ public class BusMapOverlayFragment extends Fragment {
             handler = new Handler();
         }
 
-        getBusLocations("red");
+        getBusLocations(currentRoute.toString());
         handler.postDelayed(busUpdater, busDelayms);
     }
 
