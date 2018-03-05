@@ -132,7 +132,7 @@ public class MapFragment extends SupportMapFragment {
             busRoutes.add(mapboxMap.addPolyline(new PolylineOptions()
                     .addAll(pointList)
                     .color(Color.parseColor(routeColor))
-                    .alpha(0.8f)
+                    .alpha(0.6f)
                     .width(4)));
 
             routeBounds.includes(pointList);

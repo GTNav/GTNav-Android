@@ -2,6 +2,7 @@ package com.spybug.gtnav;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,7 +28,7 @@ import java.util.List;
  * Activities that contain this fragment must implement the
  * {@link BusMapOverlayFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link BusMapOverlayFragment#newInstance} factory method to
+ * Use the {@link BusMapOverlayFragment} factory method to
  * create an instance of this fragment.
  */
 public class BusMapOverlayFragment extends Fragment {
@@ -55,6 +56,26 @@ public class BusMapOverlayFragment extends Fragment {
             this.text = text;
         }
 
+        public String getColor(Context context) {
+            Resources res = context.getResources();
+            switch (this.name()) {
+                case "RED":
+                    return res.getString(R.color.redRoute);
+                case "BLUE":
+                    return res.getString(R.color.blueRoute);
+                case "GREEN":
+                    return res.getString(R.color.greenRoute);
+                case "TROLLEY":
+                    return res.getString(R.color.techTrolley);
+                case "EXPRESS":
+                    return res.getString(R.color.techExpress);
+                case "MIDNIGHT":
+                    return res.getString(R.color.midnightRambler);
+                default:
+                    return "#FFFFFF";
+            }
+        }
+
         @Override
         public String toString() {
             return text;
@@ -69,6 +90,7 @@ public class BusMapOverlayFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getResources().getColor(R.color.redRoute);
         currentRoute = CurrentRoute.RED; //default
     }
 
@@ -77,7 +99,7 @@ public class BusMapOverlayFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bus_map_overlay, container, false);
 
-        getBusRoute(currentRoute.toString());
+        getBusRoute(currentRoute);
 
         fabSelect = view.findViewById(R.id.fabSelect);
         FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial
@@ -130,7 +152,7 @@ public class BusMapOverlayFragment extends Fragment {
                 //if user changed current route
                 if (prevRoute != currentRoute) {
                     handler.removeCallbacks(busUpdater);
-                    getBusRoute(currentRoute.toString());
+                    getBusRoute(currentRoute);
                     getBusLocations(currentRoute.toString());
                     handler.postDelayed(busUpdater, busDelayms);
                 }
@@ -206,13 +228,14 @@ public class BusMapOverlayFragment extends Fragment {
         }).execute(fRouteName);
     }
 
-    private void getBusRoute(String routeName) {
-        final String fRouteName = routeName;
+    private void getBusRoute(CurrentRoute route) {
+        final String fRouteName = route.toString();
+        final String fRouteColor = route.getColor(getContext());
 
         new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
             @Override
             public void onSuccess(List<List<LatLng>> route) {
-                ((Communicator) getActivity()).passBusRouteToMap(route, fRouteName);
+                ((Communicator) getActivity()).passBusRouteToMap(route, fRouteColor);
             }
 
             @Override
