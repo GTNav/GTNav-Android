@@ -236,18 +236,24 @@ public class MainActivity extends AppCompatActivity
 
     public void openBikesFragment() {
         if (currentState != State.BIKES) {
-            Fragment fragment = new ScheduleFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.menu_frame, fragment);
+            //Remove any menu fragments on the buses page
+            Fragment menu_fragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (menu_fragment != null) {
+                fragmentTransaction.remove(menu_fragment);
+            }
+            //Place the buses map overlay in place of whats there (if anything at all)
+            Fragment fragment = new BikesOverlayFragment();
+            fragmentTransaction.replace(R.id.map_overlay_frame, fragment);
+            //Place the main map overlay on the back stack
             if (currentState == State.MAIN) {
-                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-                fragmentTransaction.remove(overlayFragment);
                 fragmentTransaction.addToBackStack(null);
             }
             fragmentTransaction.commit();
-            currentState = State.BIKES;
 
+            mapFragment.clearMap();
+            currentState = State.BIKES;
             navMenu.setCheckedItem(R.id.nav_bikes);
         }
     }
