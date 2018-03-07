@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import java.util.List;
 
 
 /**
@@ -21,6 +24,7 @@ import android.widget.ImageButton;
 public class BikesOverlayFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ImageButton menuButton;
+    private View view;
 
     public BikesOverlayFragment() {
         // Required empty public constructor
@@ -50,12 +54,28 @@ public class BikesOverlayFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_bikes_overlay, container, false);
+        view = inflater.inflate(R.layout.fragment_bikes_overlay, container, false);
+
+        getBikeStations();
 
 
-
-        return v;
+        return view;
     }
+
+    public void getBikeStations() {
+        new BikeStationsServerRequest(getContext(), new OnEventListener<List<BikeStation>, String>() {
+            @Override
+            public void onSuccess(List<BikeStation> bikeStations) {
+                ((Communicator) getActivity()).passBikeStationsToMap(bikeStations);
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        }).execute();
+    }
+
 
     @Override
     public void onAttach(Context context) {

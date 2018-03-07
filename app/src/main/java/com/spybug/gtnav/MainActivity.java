@@ -386,4 +386,9 @@ public class MainActivity extends AppCompatActivity
     public void passBusLocationsToMap(List<LatLng> points, String routeColor) {
         mapFragment.drawBusLocations(points, routeColor);
     }
+
+    @Override
+    public void passBikeStationsToMap(List<BikeStation> bikeStations) {
+        mapFragment.drawBikeStations(bikeStations);
+    }
 }

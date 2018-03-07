@@ -38,7 +38,7 @@ public class MapFragment extends SupportMapFragment {
     private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
     public MapView map;
     private MapboxMap mapboxMap;
-    private Icon start_icon, destination_icon, bus_icon;
+    private Icon start_icon, destination_icon, bus_icon, bikestation_icon;
     private List<Marker> busMarkers;
     private List<Polyline> busRoutes;
 
@@ -62,6 +62,7 @@ public class MapFragment extends SupportMapFragment {
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
         bus_icon = iconFactory.defaultMarker();
+        bikestation_icon = iconFactory.defaultMarker();
 
         busMarkers = new ArrayList<>();
         busRoutes = new ArrayList<>();
@@ -150,6 +151,18 @@ public class MapFragment extends SupportMapFragment {
                 .position(bus)
                 .icon(bus_icon));
             busMarkers.add(newMarker);
+        }
+    }
+
+    public void drawBikeStations(List<BikeStation> bikeStations) {
+        mapboxMap.clear();
+
+        for (BikeStation bikeStation : bikeStations) {
+            Marker newMarker = mapboxMap.addMarker(new MarkerOptions()
+                    .position(bikeStation.point)
+                    .title(bikeStation.name)
+                    .snippet(bikeStation.toString())
+                    .icon(bikestation_icon));
         }
     }
 
