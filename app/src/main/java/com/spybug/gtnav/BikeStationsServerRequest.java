@@ -94,7 +94,7 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
                     JSONObject station = stations.getJSONObject(i);
                     BikeStation newStation = new BikeStation(station.getString("station_id"),
                             station.getString("name"),
-                            new LatLng(station.getDouble("lat"), station.getDouble("lon")),
+                            station.getDouble("lat"), station.getDouble("lon"),
                             station.getInt("num_bikes_available"), station.getInt("num_bikes_disabled"),
                             station.getInt("num_docks_available"));
                     bikeStations.add(newStation);

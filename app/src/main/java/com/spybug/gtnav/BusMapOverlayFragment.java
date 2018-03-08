@@ -215,9 +215,9 @@ public class BusMapOverlayFragment extends Fragment {
     private void getBusLocations(String routeName) {
         final String fRouteName = routeName;
 
-        new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<LatLng>, String>() {
+        new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
-            public void onSuccess(List<LatLng> buses) {
+            public void onSuccess(List<Bus> buses) {
                 ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteName);
             }
 

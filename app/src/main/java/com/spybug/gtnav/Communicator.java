@@ -8,7 +8,7 @@ public interface Communicator {
 
     public void passBusRouteToMap(List<List<LatLng>> points, String routeColor);
 
-    public void passBusLocationsToMap(List<LatLng> buses, String routeColor);
+    public void passBusLocationsToMap(List<Bus> buses, String routeColor);
 
     public void passBikeStationsToMap(List<BikeStation> bikeStations);
 }

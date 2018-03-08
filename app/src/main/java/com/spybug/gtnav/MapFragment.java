@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
@@ -41,6 +42,7 @@ public class MapFragment extends SupportMapFragment {
     private Icon start_icon, destination_icon, bus_icon, bikestation_icon;
     private List<Marker> busMarkers;
     private List<Polyline> busRoutes;
+    private HashMap<String, BikeStation> bikeStationsHM;
 
     /**
      * Creates the fragment view hierarchy.
@@ -66,6 +68,7 @@ public class MapFragment extends SupportMapFragment {
 
         busMarkers = new ArrayList<>();
         busRoutes = new ArrayList<>();
+        bikeStationsHM = new HashMap<>();
 
         return map;
     }
@@ -142,27 +145,36 @@ public class MapFragment extends SupportMapFragment {
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds.build(), 100));
     }
 
-    public void drawBusLocations(List<LatLng> buses, String routeColor) {
+    public void drawBusLocations(List<Bus> buses, String routeColor) {
         //TODO: update the list of markers if they are in the list, otherwise create new one
         mapboxMap.removeAnnotations(busMarkers); //removed markers
 
-        for (LatLng bus : buses) {
+        for (Bus bus : buses) {
             Marker newMarker = mapboxMap.addMarker(new MarkerOptions()
-                .position(bus)
+                .position(bus.point)
                 .icon(bus_icon));
             busMarkers.add(newMarker);
         }
     }
 
     public void drawBikeStations(List<BikeStation> bikeStations) {
-        mapboxMap.clear();
-
         for (BikeStation bikeStation : bikeStations) {
-            Marker newMarker = mapboxMap.addMarker(new MarkerOptions()
-                    .position(bikeStation.point)
-                    .title(bikeStation.name)
-                    .snippet(bikeStation.toString())
-                    .icon(bikestation_icon));
+            //If bikeStation ID already exists, then update the marker
+            if (bikeStationsHM.containsKey(bikeStation.id)) {
+                BikeStation storedBikeStation = bikeStationsHM.get(bikeStation.id);
+                Marker storedMarker = storedBikeStation.marker;
+                storedMarker.setTitle(bikeStation.name);
+                storedMarker.setSnippet(bikeStation.toString());
+            }
+            //Create a new marker for the bike station and add it to the HashMap
+            else {
+                bikeStation.marker = mapboxMap.addMarker(new MarkerOptions()
+                        .position(bikeStation.point)
+                        .title(bikeStation.name)
+                        .snippet(bikeStation.toString())
+                        .icon(bikestation_icon));
+                bikeStationsHM.put(bikeStation.id, bikeStation);
+            }
         }
     }
 

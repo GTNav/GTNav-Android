@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
  * Background task to communicate with the map server
  */
 
-public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<LatLng>> {
+public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -33,9 +34,9 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<LatL
     private WeakReference<Context> contextRef;
     private boolean hasNetwork = true;
     private int errorCode = 0;
-    private OnEventListener<List<LatLng>, String> mCallBack;
+    private OnEventListener<List<Bus>, String> mCallBack;
 
-    BusLocationsServerRequest(Context context, OnEventListener<List<LatLng>, String> callback) {
+    BusLocationsServerRequest(Context context, OnEventListener<List<Bus>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -45,13 +46,13 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<LatL
     }
 
     @Override
-    protected List<LatLng> doInBackground(Object[] objects) {
-        List<LatLng> pointsList = new ArrayList<>();
+    protected List<Bus> doInBackground(Object[] objects) {
+        List<Bus> busList = new ArrayList<>();
         String routeTag = (String)objects[0];
 
         if (!hasNetwork) {
             errorCode = 1;
-            return pointsList;
+            return busList;
         }
 
         String inputLine;
@@ -101,10 +102,11 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<LatL
                 JSONArray vehicles = new JSONArray(result);
 
                 for (int i = 0; i < vehicles.length(); i++) {
-                    JSONArray vehicle = vehicles.getJSONArray(i);
-                    pointsList.add(new LatLng(vehicle.getDouble(2),
-                            vehicle.getDouble(3)));
-
+                    JSONObject vehicle = vehicles.getJSONObject(i);
+                    Bus newBus = new Bus(vehicle.getInt("id"),
+                            vehicle.getDouble("lat"), vehicle.getDouble("lon"),
+                            vehicle.getInt("heading"), vehicle.getString("dirTag"));
+                    busList.add(newBus);
                 }
             }
             catch(JSONException ex) {
@@ -112,10 +114,10 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<LatL
             }
         }
 
-        return pointsList;
+        return busList;
     }
 
-    protected void onPostExecute(List<LatLng> result) {
+    protected void onPostExecute(List<Bus> result) {
         if (mCallBack != null) {
             if (errorCode != 0) {
                 if (errorCode == 1) {
