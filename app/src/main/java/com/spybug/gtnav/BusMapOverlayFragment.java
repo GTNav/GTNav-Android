@@ -102,10 +102,9 @@ public class BusMapOverlayFragment extends Fragment {
         getBusRoute(currentRoute);
 
         fabSelect = view.findViewById(R.id.fabSelect);
-        FloatingActionButton fabRed =  view.findViewById(R.id.fabRed); //initial
 
         final List<FloatingActionButton> fabButtons = new LinkedList<>();
-        fabButtons.add((FloatingActionButton) fabRed);
+        fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabRed));
         fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabBlue));
         fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabGreen));
         fabButtons.add((FloatingActionButton) view.findViewById(R.id.fabMidnight));
@@ -168,29 +167,9 @@ public class BusMapOverlayFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (fabExpanded){
-                    ColorStateList color = ColorStateList.valueOf(Color.parseColor("#ffffff"));
-                    switch(currentRoute) {
-                        case RED:
-                            color = fabButtons.get(0).getBackgroundTintList();
-                            break;
-                        case BLUE:
-                            color = fabButtons.get(1).getBackgroundTintList();
-                            break;
-                        case GREEN:
-                            color = fabButtons.get(2).getBackgroundTintList();
-                            break;
-                        case TROLLEY:
-                            color = fabButtons.get(3).getBackgroundTintList();
-                            break;
-                        case MIDNIGHT:
-                            color = fabButtons.get(4).getBackgroundTintList();
-                            break;
-                        case EXPRESS:
-                            color = fabButtons.get(5).getBackgroundTintList();
-                            break;
-                        default:
-                            break;
-                    }
+                    ColorStateList color = ColorStateList.valueOf(
+                            Color.parseColor(currentRoute.getColor(getContext())));
+
                     closeSubMenusFab(color);
                 } else {
                     openSubMenusFab();
@@ -199,7 +178,8 @@ public class BusMapOverlayFragment extends Fragment {
         });
 
         currentRoute = CurrentRoute.RED; //Default route, will be set based on saved last viewed route later
-        closeSubMenusFab(fabRed.getBackgroundTintList());
+        closeSubMenusFab(ColorStateList.valueOf(
+                Color.parseColor(currentRoute.getColor(getContext()))));
 
         return view;
     }
