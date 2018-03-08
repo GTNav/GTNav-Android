@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -28,6 +29,16 @@ public final class HelperUtil {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public static Bitmap rotateBitmap(Bitmap original, float degrees) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+
+        Matrix matrix = new Matrix();
+        matrix.preRotate(degrees);
+
+        return Bitmap.createBitmap(original, 0, 0, width, height, matrix, true);
     }
 
     /**

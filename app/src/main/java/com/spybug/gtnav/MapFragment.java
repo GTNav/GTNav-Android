@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
+import static com.spybug.gtnav.HelperUtil.rotateBitmap;
 
 
 public class MapFragment extends SupportMapFragment {
@@ -41,8 +42,10 @@ public class MapFragment extends SupportMapFragment {
     private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
     public MapView map;
     private MapboxMap mapboxMap;
-    private Icon start_icon, destination_icon, bus_icon, bikestation_icon;
-    private List<Marker> busMarkers;
+    private IconFactory iconFactory;
+    private Icon start_icon, destination_icon, bikestation_icon;
+    private Bitmap bus_icon;
+
     private List<Polyline> busRoutes;
     private HashMap<Integer, Bus> busesHM;
     private HashMap<String, BikeStation> bikeStationsHM;
@@ -60,16 +63,16 @@ public class MapFragment extends SupportMapFragment {
         map = (MapView) super.onCreateView(inflater, container, savedInstanceState);
 
         Resources resources = getResources();
-        IconFactory iconFactory = IconFactory.getInstance((map).getContext());
+        iconFactory = IconFactory.getInstance((map).getContext());
         Drawable startMarkerDrawable = resources.getDrawable(R.drawable.start_marker);
 
         Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
+        bus_icon = drawableToBitmap(resources.getDrawable(R.drawable.mapbox_marker_icon_default));
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
-        bus_icon = iconFactory.defaultMarker();
+        //bus_icon = iconFactory.defaultMarker();
         bikestation_icon = iconFactory.defaultMarker();
 
-        busMarkers = new ArrayList<>();
         busRoutes = new ArrayList<>();
         busesHM = new HashMap<>();
         bikeStationsHM = new HashMap<>();
@@ -150,6 +153,10 @@ public class MapFragment extends SupportMapFragment {
     }
 
     public void drawBusLocations(List<Bus> buses, String routeColor) {
+        //TODO: Change icon color based on route
+        //TODO: Use Symbol Layer for markers so rotation works properly
+        // https://www.mapbox.com/android-docs/api/map-sdk/5.2.1/com/mapbox/mapboxsdk/style/layers/SymbolLayer.html
+
         for (Bus bus : buses) {
             Bus storedBus = busesHM.get(bus.id);
             //If bus ID already exists, then update the marker in the Bus object
@@ -159,13 +166,15 @@ public class MapFragment extends SupportMapFragment {
                         storedMarker.getPosition(), bus.point);
                 markerAnimator.setDuration(1500);
                 markerAnimator.start();
+                Icon rotatedIcon = iconFactory.fromBitmap(rotateBitmap(bus_icon, bus.heading));
+                storedMarker.setIcon(rotatedIcon);
             }
             //Create a new marker for the bus and add it to the HashMap
             else {
                 bus.marker = mapboxMap.addMarker(new MarkerOptions()
                         .position(bus.point)
                         .title(Integer.toString(bus.id))
-                        .icon(bus_icon));
+                        .icon(iconFactory.fromBitmap(rotateBitmap(bus_icon, bus.heading))));
                 busesHM.put(bus.id, bus);
             }
         }

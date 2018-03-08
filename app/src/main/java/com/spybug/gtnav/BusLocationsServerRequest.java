@@ -125,7 +125,7 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
                     mCallBack.onFailure(info);
                 }
             }
-            else {
+            else if (result.size() > 0) {
                 mCallBack.onSuccess(result);
             }
         }
