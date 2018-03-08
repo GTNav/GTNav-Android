@@ -1,5 +1,7 @@
 package com.spybug.gtnav;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -42,6 +44,7 @@ public class MapFragment extends SupportMapFragment {
     private Icon start_icon, destination_icon, bus_icon, bikestation_icon;
     private List<Marker> busMarkers;
     private List<Polyline> busRoutes;
+    private HashMap<Integer, Bus> busesHM;
     private HashMap<String, BikeStation> bikeStationsHM;
 
     /**
@@ -68,6 +71,7 @@ public class MapFragment extends SupportMapFragment {
 
         busMarkers = new ArrayList<>();
         busRoutes = new ArrayList<>();
+        busesHM = new HashMap<>();
         bikeStationsHM = new HashMap<>();
 
         return map;
@@ -146,22 +150,32 @@ public class MapFragment extends SupportMapFragment {
     }
 
     public void drawBusLocations(List<Bus> buses, String routeColor) {
-        //TODO: update the list of markers if they are in the list, otherwise create new one
-        mapboxMap.removeAnnotations(busMarkers); //removed markers
-
         for (Bus bus : buses) {
-            Marker newMarker = mapboxMap.addMarker(new MarkerOptions()
-                .position(bus.point)
-                .icon(bus_icon));
-            busMarkers.add(newMarker);
+            Bus storedBus = busesHM.get(bus.id);
+            //If bus ID already exists, then update the marker in the Bus object
+            if (storedBus != null) {
+                Marker storedMarker = storedBus.marker;
+                ValueAnimator markerAnimator = ObjectAnimator.ofObject(storedMarker, "position", new HelperUtil.LatLngEvaluator(),
+                        storedMarker.getPosition(), bus.point);
+                markerAnimator.setDuration(1500);
+                markerAnimator.start();
+            }
+            //Create a new marker for the bus and add it to the HashMap
+            else {
+                bus.marker = mapboxMap.addMarker(new MarkerOptions()
+                        .position(bus.point)
+                        .title(Integer.toString(bus.id))
+                        .icon(bus_icon));
+                busesHM.put(bus.id, bus);
+            }
         }
     }
 
     public void drawBikeStations(List<BikeStation> bikeStations) {
         for (BikeStation bikeStation : bikeStations) {
+            BikeStation storedBikeStation = bikeStationsHM.get(bikeStation.id);
             //If bikeStation ID already exists, then update the marker
-            if (bikeStationsHM.containsKey(bikeStation.id)) {
-                BikeStation storedBikeStation = bikeStationsHM.get(bikeStation.id);
+            if (storedBikeStation != null) {
                 Marker storedMarker = storedBikeStation.marker;
                 storedMarker.setTitle(bikeStation.name);
                 storedMarker.setSnippet(bikeStation.toString());
@@ -181,6 +195,15 @@ public class MapFragment extends SupportMapFragment {
     public void clearMap() {
         if (mapboxMap != null) {
             mapboxMap.clear();
+        }
+    }
+
+    public void clearBuses() {
+        if (mapboxMap != null) {
+            for (Bus b : busesHM.values()) {
+                mapboxMap.removeAnnotation(b.marker);
+            }
+            busesHM.clear();
         }
     }
 

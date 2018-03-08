@@ -391,4 +391,9 @@ public class MainActivity extends AppCompatActivity
     public void passBikeStationsToMap(List<BikeStation> bikeStations) {
         mapFragment.drawBikeStations(bikeStations);
     }
+
+    @Override
+    public void clearBuses() {
+        mapFragment.clearBuses();
+    }
 }

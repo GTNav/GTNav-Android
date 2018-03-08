@@ -11,4 +11,6 @@ public interface Communicator {
     public void passBusLocationsToMap(List<Bus> buses, String routeColor);
 
     public void passBikeStationsToMap(List<BikeStation> bikeStations);
+
+    public void clearBuses();
 }

@@ -152,6 +152,7 @@ public class BusMapOverlayFragment extends Fragment {
                 //if user changed current route
                 if (prevRoute != currentRoute) {
                     handler.removeCallbacks(busUpdater);
+                    ((Communicator) getActivity()).clearBuses();
                     getBusRoute(currentRoute);
                     getBusLocations(currentRoute.toString());
                     handler.postDelayed(busUpdater, busDelayms);
