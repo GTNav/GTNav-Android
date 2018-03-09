@@ -153,7 +153,7 @@ public class BusMapOverlayFragment extends Fragment {
                     handler.removeCallbacks(busUpdater);
                     ((Communicator) getActivity()).clearBuses();
                     getBusRoute(currentRoute);
-                    getBusLocations(currentRoute.toString());
+                    getBusLocations(currentRoute);
                     handler.postDelayed(busUpdater, busDelayms);
                 }
             }
@@ -187,19 +187,20 @@ public class BusMapOverlayFragment extends Fragment {
     private Runnable busUpdater = new Runnable() {
         @Override
         public void run() {
-            getBusLocations(currentRoute.toString());
+            getBusLocations(currentRoute);
             //Toast.makeText(view.getContext(), "Making bus request", Toast.LENGTH_SHORT).show(); //For debugging to tell when bus location updated
             handler.postDelayed(busUpdater, busDelayms);
         }
     };
 
-    private void getBusLocations(String routeName) {
-        final String fRouteName = routeName;
+    private void getBusLocations(CurrentRoute route) {
+        final String fRouteName = route.toString();
+        final String fRouteColor = route.getColor(getContext());
 
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
             public void onSuccess(List<Bus> buses) {
-                ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteName);
+                ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteColor);
             }
 
             @Override
@@ -294,7 +295,7 @@ public class BusMapOverlayFragment extends Fragment {
             handler = new Handler();
         }
 
-        getBusLocations(currentRoute.toString());
+        getBusLocations(currentRoute);
         handler.postDelayed(busUpdater, busDelayms);
     }
 

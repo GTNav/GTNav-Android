@@ -5,6 +5,8 @@ import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +47,7 @@ public class MapFragment extends SupportMapFragment {
     private IconFactory iconFactory;
     private Icon start_icon, destination_icon, bikestation_icon;
     private Bitmap bus_icon;
+    private String lastRouteColor;
 
     private List<Polyline> busRoutes;
     private HashMap<Integer, Bus> busesHM;
@@ -67,7 +70,8 @@ public class MapFragment extends SupportMapFragment {
         Drawable startMarkerDrawable = resources.getDrawable(R.drawable.start_marker);
 
         Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
-        bus_icon = drawableToBitmap(resources.getDrawable(R.drawable.mapbox_marker_icon_default));
+        lastRouteColor = "";
+
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
         //bus_icon = iconFactory.defaultMarker();
@@ -166,7 +170,7 @@ public class MapFragment extends SupportMapFragment {
                         storedMarker.getPosition(), bus.point);
                 markerAnimator.setDuration(1500);
                 markerAnimator.start();
-                Icon rotatedIcon = iconFactory.fromBitmap(rotateBitmap(bus_icon, bus.heading));
+                Icon rotatedIcon = iconFactory.fromBitmap(rotateBitmap(getBusIcon(routeColor), bus.heading));
                 storedMarker.setIcon(rotatedIcon);
             }
             //Create a new marker for the bus and add it to the HashMap
@@ -174,7 +178,7 @@ public class MapFragment extends SupportMapFragment {
                 bus.marker = mapboxMap.addMarker(new MarkerOptions()
                         .position(bus.point)
                         .title(Integer.toString(bus.id))
-                        .icon(iconFactory.fromBitmap(rotateBitmap(bus_icon, bus.heading))));
+                        .icon(iconFactory.fromBitmap(rotateBitmap(getBusIcon(routeColor), bus.heading))));
                 busesHM.put(bus.id, bus);
             }
         }
@@ -199,6 +203,16 @@ public class MapFragment extends SupportMapFragment {
                 bikeStationsHM.put(bikeStation.id, bikeStation);
             }
         }
+    }
+
+    private Bitmap getBusIcon(String routeColor) {
+        if (!routeColor.equals(lastRouteColor)) {
+            Drawable icon_drawable = getResources().getDrawable(R.drawable.bus_icon_white).mutate();
+            icon_drawable.setColorFilter(new PorterDuffColorFilter(Color.parseColor(routeColor), PorterDuff.Mode.SRC_IN));
+            bus_icon = Bitmap.createScaledBitmap(drawableToBitmap(icon_drawable), 50, 85, false);
+            lastRouteColor = routeColor;
+        }
+        return bus_icon;
     }
 
     public void clearMap() {
