@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.List;
@@ -55,6 +56,17 @@ public class BikesOverlayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bikes_overlay, container, false);
+        final Switch stationSwitch = view.findViewById(R.id.bike_station_switch);
+        stationSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!stationSwitch.isChecked()) {
+                    hideBikeStations();
+                } else {
+                    showBikeStations();
+                }
+            }
+        });
 
         getBikeStations();
 
@@ -74,6 +86,14 @@ public class BikesOverlayFragment extends Fragment {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
         }).execute();
+    }
+
+    private void hideBikeStations() {
+        //TODO
+    }
+
+    private void showBikeStations() {
+        //TODO
     }
 
 
