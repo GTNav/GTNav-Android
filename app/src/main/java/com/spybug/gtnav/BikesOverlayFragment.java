@@ -1,6 +1,7 @@
 package com.spybug.gtnav;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -62,8 +63,10 @@ public class BikesOverlayFragment extends Fragment {
             public void onClick(View view) {
                 if (!stationSwitch.isChecked()) {
                     hideBikeStations();
+                    stationSwitch.setText(getString(R.string.show_station_switch_text));
                 } else {
                     showBikeStations();
+                    stationSwitch.setText(getString(R.string.show_racks_switch_text));
                 }
             }
         });
@@ -88,10 +91,16 @@ public class BikesOverlayFragment extends Fragment {
         }).execute();
     }
 
+    /**
+     * Hides the bike stations on the map and displays the bike rack locations
+     */
     private void hideBikeStations() {
         //TODO
     }
 
+    /**
+     * Hides the bike rack locations on the map and shows the bike stations
+     */
     private void showBikeStations() {
         //TODO
     }

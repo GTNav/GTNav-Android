@@ -16,6 +16,6 @@
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
         android:background="@color/white"
-        android:text="@string/bike_station_switch_text" />
+        android:text="@string/show_racks_switch_text" />
 
 </RelativeLayout>
