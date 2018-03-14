@@ -47,8 +47,8 @@ public class BusMapOverlayFragment extends Fragment {
         BLUE("blue"),
         GREEN("green"),
         TROLLEY("trolley"),
-        MIDNIGHT("night"),
-        EXPRESS("tech");
+        MIDNIGHT("midnight"),
+        EXPRESS("express");
 
         private final String text;
 

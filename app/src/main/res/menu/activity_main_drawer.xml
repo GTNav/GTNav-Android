@@ -5,6 +5,11 @@
 
     <group android:id="@+id/nav_maingroup" android:checkableBehavior="all">
         <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_search_black"
+            android:checkable="true"
+            android:title="@string/map"/>
+        <item
             android:id="@+id/nav_directions"
             android:icon="@drawable/ic_directions_arrow_black"
             android:checkable="true"

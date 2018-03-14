@@ -8,6 +8,8 @@
     <string name="show_racks_switch_text">Show Bike Racks</string>
 
     <!--Menu items strings-->
+    <string name="map">Map</string>
+    <string name="map_underline"><u>Map</u></string>
     <string name="directions">Directions</string>
     <string name="directions_underline"><u>Directions</u></string>
     <string name="bikes">Bikes</string>
