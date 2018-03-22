@@ -81,7 +81,10 @@ public class BikesOverlayFragment extends Fragment {
         new BikeStationsServerRequest(getContext(), new OnEventListener<List<BikeStation>, String>() {
             @Override
             public void onSuccess(List<BikeStation> bikeStations) {
-                ((Communicator) getActivity()).passBikeStationsToMap(bikeStations);
+                Communicator communicator = (Communicator) getActivity();
+                if (communicator != null) {
+                    communicator.passBikeStationsToMap(bikeStations);
+                }
             }
 
             @Override

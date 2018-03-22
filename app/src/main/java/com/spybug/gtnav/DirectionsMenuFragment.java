@@ -99,7 +99,10 @@ public class DirectionsMenuFragment extends Fragment {
         v.findViewById(R.id.directions_back_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).onBackPressed();
+                MainActivity activity = (MainActivity) getActivity();
+                if (activity != null) {
+                    activity.onBackPressed();
+                }
             }
         });
 
@@ -161,7 +164,9 @@ public class DirectionsMenuFragment extends Fragment {
 
                     //hide the keyboard
                     InputMethodManager imm = (InputMethodManager) myView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
 
                     if (!directionsRequested) {
                         makeDirectionsRequest();
@@ -203,7 +208,10 @@ public class DirectionsMenuFragment extends Fragment {
                 DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<LatLng[], String>() {
                     @Override
                     public void onSuccess(LatLng[] points) {
-                        ((Communicator) getActivity()).passRouteToMap(points);
+                        Communicator communicator = (Communicator) getActivity();
+                        if (communicator != null) {
+                            communicator.passRouteToMap(points);
+                        }
                     }
 
                     @Override
@@ -270,7 +278,11 @@ public class DirectionsMenuFragment extends Fragment {
     }
 
     private void checkLocation() {
-        Location lastLocation = ((MainActivity) getActivity()).getLastLocation();
+        MainActivity activity = (MainActivity) getActivity();
+        Location lastLocation = null;
+        if (activity != null) {
+            lastLocation = activity.getLastLocation();
+        }
 
         if (lastLocation != null) {
             startLocation.setText(getString(R.string.current_location));

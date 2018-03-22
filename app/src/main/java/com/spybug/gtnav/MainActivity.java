@@ -40,6 +40,8 @@ import static com.spybug.gtnav.HelperUtil.convertDpToPixel;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener, Communicator {
 
+    private final static String ROOT_TAG = "root_fragment";
+
     private MapboxMap map;
     private MapFragment mapFragment;
     private NavigationView navMenu;
@@ -58,7 +60,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        currentState = State.MAIN;
+        currentState = null;
+
+        navMenu = findViewById(R.id.nav_view);
+        navMenu.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -74,12 +79,12 @@ public class MainActivity extends AppCompatActivity
 
             mapFragment = MapFragment.newInstance(options);
             Fragment bottomBarFragment = new BottomNavbarFragment();
-            Fragment mainMapOverlayFragment = new MainMapOverlayFragment();
 
             transaction.add(R.id.map_frame, mapFragment, "com.mapbox.map");
             transaction.add(R.id.bottom_bar_frame, bottomBarFragment, "com.gtnav.bottomBar");
-            transaction.add(R.id.map_overlay_frame, mainMapOverlayFragment, "com.gtnav.mainMapOverlay");
             transaction.commit();
+
+            openMainMapFragment();
         } else {
             mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
@@ -102,19 +107,21 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        navMenu = findViewById(R.id.nav_view);
-        navMenu.setNavigationItemSelectedListener(this);
+
     }
 
-
-    //TODO: Currently memory leak exists with busmapoverlay fragment staying alive because of fragment manager backstack, so it keeps requesting bus update
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (currentState == State.MAIN) {
+                supportFinishAfterTransition();
+            }
+            else {
+                openMainMapFragment();
+            }
         }
     }
 
@@ -188,21 +195,39 @@ public class MainActivity extends AppCompatActivity
         currentState = State.MAIN;
     }
 
+    public void openMainMapFragment() {
+        if (currentState != State.MAIN) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.map_overlay_frame, new MainMapOverlayFragment(), "map_overlay");
+            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (menuFragment != null) {
+                transaction.remove(menuFragment);
+            }
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
+
+            mapFragment.clearMap();
+            currentState = State.MAIN;
+            navMenu.setCheckedItem(R.id.nav_map);
+        }
+    }
+
     public void openDirectionsMenuFragment() {
         if (currentState != State.DIRECTIONS) {
-            Fragment fragment = new DirectionsMenuFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            //Place the directions menu in place of whats there (if anything at all)
-            fragmentTransaction.replace(R.id.menu_frame, fragment);
-            //Remove any map overlays
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
             Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            fragmentTransaction.remove(overlayFragment);
-            //Add main overlay to back stack
-            if (currentState == State.MAIN) {
-                fragmentTransaction.addToBackStack(null);
+            if (overlayFragment != null) {
+                transaction.remove(overlayFragment);
             }
-            fragmentTransaction.commit();
+            transaction.replace(R.id.menu_frame, new DirectionsMenuFragment(), "directions_menu");
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
 
             mapFragment.clearMap();
             currentState = State.DIRECTIONS;
@@ -213,20 +238,16 @@ public class MainActivity extends AppCompatActivity
     public void openBusesFragment() {
         if (currentState != State.BUSES) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            //Remove any menu fragments on the buses page
-            Fragment menu_fragment = fragmentManager.findFragmentById(R.id.menu_frame);
-            if (menu_fragment != null) {
-                fragmentTransaction.remove(menu_fragment);
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.map_overlay_frame, new BusMapOverlayFragment(), "bus_overlay");
+            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (menuFragment != null) {
+                transaction.remove(menuFragment);
             }
-            //Place the buses map overlay in place of whats there (if anything at all)
-            Fragment fragment = new BusMapOverlayFragment();
-            fragmentTransaction.replace(R.id.map_overlay_frame, fragment);
-            //Place the main map overlay on the back stack
-            if (currentState == State.MAIN) {
-                fragmentTransaction.addToBackStack(null);
-            }
-            fragmentTransaction.commit();
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
 
             mapFragment.clearMap();
             currentState = State.BUSES;
@@ -237,20 +258,16 @@ public class MainActivity extends AppCompatActivity
     public void openBikesFragment() {
         if (currentState != State.BIKES) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            //Remove any menu fragments on the buses page
-            Fragment menu_fragment = fragmentManager.findFragmentById(R.id.menu_frame);
-            if (menu_fragment != null) {
-                fragmentTransaction.remove(menu_fragment);
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.map_overlay_frame, new BikesOverlayFragment(), "bike_overlay");
+            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (menuFragment != null) {
+                transaction.remove(menuFragment);
             }
-            //Place the buses map overlay in place of whats there (if anything at all)
-            Fragment fragment = new BikesOverlayFragment();
-            fragmentTransaction.replace(R.id.map_overlay_frame, fragment);
-            //Place the main map overlay on the back stack
-            if (currentState == State.MAIN) {
-                fragmentTransaction.addToBackStack(null);
-            }
-            fragmentTransaction.commit();
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
 
             mapFragment.clearMap();
             currentState = State.BIKES;

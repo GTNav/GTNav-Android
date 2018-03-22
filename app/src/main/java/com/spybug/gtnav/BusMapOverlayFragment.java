@@ -200,7 +200,10 @@ public class BusMapOverlayFragment extends Fragment {
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
             public void onSuccess(List<Bus> buses) {
-                ((Communicator) getActivity()).passBusLocationsToMap(buses, fRouteColor);
+                Communicator communicator = (Communicator) getActivity();
+                if (communicator != null) {
+                    communicator.passBusLocationsToMap(buses, fRouteColor);
+                }
             }
 
             @Override
@@ -217,7 +220,10 @@ public class BusMapOverlayFragment extends Fragment {
         new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
             @Override
             public void onSuccess(List<List<LatLng>> route) {
-                ((Communicator) getActivity()).passBusRouteToMap(route, fRouteColor);
+                Communicator communicator = (Communicator) getActivity();
+                if (communicator != null) {
+                    communicator.passBusRouteToMap(route, fRouteColor);
+                }
             }
 
             @Override
