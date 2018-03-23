@@ -38,6 +38,7 @@
                 android:tint="@color/colorAccent"/>
 
             <TextView
+                android:id="@+id/map_button_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -72,6 +73,7 @@
                 android:tint="@color/colorAccent"/>
 
             <TextView
+                android:id="@+id/directions_button_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -107,6 +109,7 @@
                 android:tint="@color/colorAccent"/>
 
             <TextView
+                android:id="@+id/buses_button_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -141,6 +144,7 @@
                 android:tint="@color/colorAccent"/>
 
             <TextView
+                android:id="@+id/bikes_button_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

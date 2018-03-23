@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
+    private BottomNavbarFragment bottomBarFragment;
     private State currentState;
 
     private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
@@ -66,7 +67,8 @@ public class MainActivity extends AppCompatActivity
         navMenu.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
 
             LatLng GT = new LatLng(33.7756, -84.3963);
 
@@ -78,11 +80,12 @@ public class MainActivity extends AppCompatActivity
                     .build());
 
             mapFragment = MapFragment.newInstance(options);
-            Fragment bottomBarFragment = new BottomNavbarFragment();
+            bottomBarFragment = new BottomNavbarFragment();
 
             transaction.add(R.id.map_frame, mapFragment, "com.mapbox.map");
             transaction.add(R.id.bottom_bar_frame, bottomBarFragment, "com.gtnav.bottomBar");
             transaction.commit();
+            fragmentManager.executePendingTransactions();
 
             openMainMapFragment();
         } else {
@@ -117,10 +120,10 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (currentState == State.MAIN) {
-                supportFinishAfterTransition();
+                supportFinishAfterTransition(); //Exit app if on main page
             }
             else {
-                openMainMapFragment();
+                openMainMapFragment(); //Go back to main map fragment if not already there
             }
         }
     }
@@ -197,82 +200,77 @@ public class MainActivity extends AppCompatActivity
 
     public void openMainMapFragment() {
         if (currentState != State.MAIN) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            openFragmentPage(null, new MainMapOverlayFragment());
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.map_overlay_frame, new MainMapOverlayFragment(), "map_overlay");
-            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-            if (menuFragment != null) {
-                transaction.remove(menuFragment);
-            }
-            transaction.addToBackStack(ROOT_TAG);
-            transaction.commit();
-
-            mapFragment.clearMap();
             currentState = State.MAIN;
             navMenu.setCheckedItem(R.id.nav_map);
+            bottomBarFragment.highlightMainMap();
         }
     }
 
-    public void openDirectionsMenuFragment() {
+    public void openDirectionsFragment() {
         if (currentState != State.DIRECTIONS) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            openFragmentPage(new DirectionsMenuFragment(), null);
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            if (overlayFragment != null) {
-                transaction.remove(overlayFragment);
-            }
-            transaction.replace(R.id.menu_frame, new DirectionsMenuFragment(), "directions_menu");
-            transaction.addToBackStack(ROOT_TAG);
-            transaction.commit();
-
-            mapFragment.clearMap();
             currentState = State.DIRECTIONS;
             navMenu.setCheckedItem(R.id.nav_directions);
+            bottomBarFragment.highlightDirections();
         }
     }
 
     public void openBusesFragment() {
         if (currentState != State.BUSES) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            openFragmentPage(null, new BusMapOverlayFragment());
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.map_overlay_frame, new BusMapOverlayFragment(), "bus_overlay");
-            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-            if (menuFragment != null) {
-                transaction.remove(menuFragment);
-            }
-            transaction.addToBackStack(ROOT_TAG);
-            transaction.commit();
-
-            mapFragment.clearMap();
             currentState = State.BUSES;
             navMenu.setCheckedItem(R.id.nav_buses);
+            bottomBarFragment.highlightBuses();
         }
     }
 
     public void openBikesFragment() {
         if (currentState != State.BIKES) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            openFragmentPage(null, new BikesOverlayFragment());
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.map_overlay_frame, new BikesOverlayFragment(), "bike_overlay");
-            Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-            if (menuFragment != null) {
-                transaction.remove(menuFragment);
-            }
-            transaction.addToBackStack(ROOT_TAG);
-            transaction.commit();
-
-            mapFragment.clearMap();
             currentState = State.BIKES;
             navMenu.setCheckedItem(R.id.nav_bikes);
+            bottomBarFragment.highlightBikes();
         }
+    }
+
+    // Opens the fragments passed in after popping whatever is on the back stack
+    public void openFragmentPage(Fragment menuFragment, Fragment overlayFragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE); //Pops previous items on Fragment back stack
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        //Place overlay fragment if not null
+        if (overlayFragment != null) {
+            transaction.replace(R.id.map_overlay_frame, overlayFragment);
+        }
+        //Remove previous overlayFragment if it exists
+        else {
+            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            if (prevOverlayFragment != null) {
+                transaction.remove(prevOverlayFragment);
+            }
+        }
+        //Place menu fragment if not null
+        if (menuFragment != null) {
+            transaction.replace(R.id.menu_frame, menuFragment);
+        }
+        //Remove previous menu fragment if it exists
+        else {
+            Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (prevMenuFragment != null) {
+                transaction.remove(prevMenuFragment);
+            }
+        }
+
+        transaction.addToBackStack(ROOT_TAG);
+        transaction.commit();
+
+        mapFragment.clearMap();
     }
 
     public void openDrawer() {
@@ -322,8 +320,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void setCameraPosition(Location location) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 16));
+        if (GT_BOUNDS.contains(new LatLng(location.getLatitude(), location.getLongitude()))) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(location.getLatitude(), location.getLongitude()), 16));
+        }
     }
 
     @Override
