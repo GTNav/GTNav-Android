@@ -217,6 +217,7 @@ public class MapFragment extends SupportMapFragment {
 
     public void clearMap() {
         if (mapboxMap != null) {
+            clearBuses();
             mapboxMap.clear();
         }
     }

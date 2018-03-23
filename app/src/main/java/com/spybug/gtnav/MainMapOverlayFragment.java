@@ -51,8 +51,7 @@ public class MainMapOverlayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main_map_overlay, container, false);
-
-        ((MainActivity) getActivity()).resetMainState();
+        
         menuButton = v.findViewById(R.id.search_bar_menubutton);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override

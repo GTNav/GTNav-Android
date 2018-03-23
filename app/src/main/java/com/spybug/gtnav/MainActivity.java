@@ -136,12 +136,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         Fragment newFragment = null;
 
-        if (id == R.id.nav_directions) {
-            newFragment = new DirectionsMenuFragment();
+        if (id == R.id.nav_map) {
+            openMainMapFragment();
+        } else if (id == R.id.nav_directions) {
+            openDirectionsFragment();
         } else if (id == R.id.nav_buses) {
-            newFragment = new ScheduleFragment();
+            openBusesFragment();
         } else if (id == R.id.nav_bikes) {
-            newFragment = new ScheduleFragment();
+            openBikesFragment();
         } else if (id == R.id.nav_schedule) {
             newFragment = new ScheduleFragment();
         } else if (id == R.id.nav_settings) {
@@ -154,49 +156,28 @@ public class MainActivity extends AppCompatActivity
             newFragment = new ScheduleFragment();
         }
 
-        try {
-            if (currentState == State.MAIN) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-                Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-                fragmentTransaction.remove(overlayFragment);
-                fragmentTransaction.remove(menuFragment);
-                fragmentTransaction.add(R.id.menu_frame, newFragment).addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (currentState == State.MAIN) {
+//                FragmentManager fragmentManager = getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+//                Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+//                fragmentTransaction.remove(overlayFragment);
+//                fragmentTransaction.remove(menuFragment);
+//                fragmentTransaction.add(R.id.menu_frame, newFragment).addToBackStack(null);
+//                fragmentTransaction.commit();
+//            }
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         closeDrawer();
         item.setChecked(true);
         return true;
     }
 
-    public void resetMainState() {
-        Menu menu = navMenu.getMenu();
-        if (navMenu != null) {
-            for (int i = 0; i < menu.size(); i++) {
-                MenuItem item = menu.getItem(i);
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                }
-            }
-        }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-        if (menuFragment != null) {
-            fragmentTransaction.remove(menuFragment);
-        }
-
-        mapFragment.clearMap();
-        currentState = State.MAIN;
-    }
 
     public void openMainMapFragment() {
         if (currentState != State.MAIN) {
