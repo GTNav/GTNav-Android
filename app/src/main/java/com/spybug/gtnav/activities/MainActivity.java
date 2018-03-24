@@ -42,6 +42,7 @@ import com.spybug.gtnav.fragments.ScheduleFragment;
 import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.models.Bus;
+import com.spybug.gtnav.models.BusStop;
 
 import java.util.List;
 
@@ -408,7 +409,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void passBusStopsToMap(List<BusStop> busStops, String routeColor) {
+        mapFragment.drawBusStops(busStops, routeColor);
+    }
+
+    @Override
     public void clearBuses() {
-        mapFragment.clearBuses();
+        mapFragment.clearBusesAndStops();
     }
 }

@@ -18,11 +18,13 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.spybug.gtnav.models.Bus;
+import com.spybug.gtnav.models.BusStop;
 import com.spybug.gtnav.utils.BusLocationsServerRequest;
 import com.spybug.gtnav.utils.BusRouteServerRequest;
 import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.interfaces.OnEventListener;
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.utils.BusStopServerRequest;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -105,6 +107,7 @@ public class BusMapOverlayFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_bus_map_overlay, container, false);
 
         getBusRoute(currentRoute);
+        getBusStops(currentRoute);
 
         fabSelect = view.findViewById(R.id.fabSelect);
 
@@ -158,6 +161,7 @@ public class BusMapOverlayFragment extends Fragment {
                     handler.removeCallbacks(busUpdater);
                     ((Communicator) getActivity()).clearBuses();
                     getBusRoute(currentRoute);
+                    getBusStops(currentRoute);
                     getBusLocations(currentRoute);
                     handler.postDelayed(busUpdater, busDelayms);
                 }
@@ -228,6 +232,26 @@ public class BusMapOverlayFragment extends Fragment {
                 Communicator communicator = (Communicator) getActivity();
                 if (communicator != null) {
                     communicator.passBusRouteToMap(route, fRouteColor);
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        }).execute(fRouteName);
+    }
+
+    public void getBusStops(CurrentRoute route) {
+        final String fRouteName = route.toString();
+        final String fRouteColor = route.getColor(getContext());
+
+        new BusStopServerRequest(view.getContext(), new OnEventListener<List<BusStop>, String>() {
+            @Override
+            public void onSuccess(List<BusStop> stops) {
+                Communicator communicator = (Communicator) getActivity();
+                if (communicator != null) {
+                    communicator.passBusStopsToMap(stops, fRouteColor);
                 }
             }
 

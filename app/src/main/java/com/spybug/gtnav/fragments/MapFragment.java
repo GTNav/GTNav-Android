@@ -32,6 +32,7 @@ import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.models.Bus;
+import com.spybug.gtnav.models.BusStop;
 import com.spybug.gtnav.utils.HelperUtil;
 import com.spybug.gtnav.R;
 
@@ -49,12 +50,13 @@ public class MapFragment extends SupportMapFragment {
     public MapView map;
     private MapboxMap mapboxMap;
     private IconFactory iconFactory;
-    private Icon start_icon, destination_icon, bikestation_icon;
+    private Icon start_icon, destination_icon, bikestation_icon, busstop_icon;
     private Bitmap bus_icon;
     private String lastRouteColor;
 
     private List<Polyline> busRoutes;
     private HashMap<Integer, Bus> busesHM;
+    private HashMap<String, BusStop> busStopHM;
     private HashMap<String, BikeStation> bikeStationsHM;
 
     /**
@@ -80,9 +82,11 @@ public class MapFragment extends SupportMapFragment {
         destination_icon = iconFactory.defaultMarker();
         //bus_icon = iconFactory.defaultMarker();
         bikestation_icon = iconFactory.defaultMarker();
+        busstop_icon = iconFactory.defaultMarker();
 
         busRoutes = new ArrayList<>();
         busesHM = new HashMap<>();
+        busStopHM = new HashMap<>();
         bikeStationsHM = new HashMap<>();
 
         return map;
@@ -160,6 +164,25 @@ public class MapFragment extends SupportMapFragment {
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds.build(), 100));
     }
 
+    public void drawBusStops(List<BusStop> busStops, String routeColor) {
+        for (BusStop busStop : busStops) {
+            BusStop storedBusStop = busStopHM.get(busStop.id);
+            if (storedBusStop != null) {
+                Marker storedMarker = storedBusStop.marker;
+                storedMarker.setSnippet(busStop.toString()); //TODO: Update busStopMarker with new estimation info
+            }
+            else {
+                busStop.marker = mapboxMap.addMarker(new MarkerOptions()
+                .position(busStop.point)
+                .title(busStop.name)
+                .snippet(busStop.toString())
+                .icon(busstop_icon));
+
+                busStopHM.put(busStop.id, busStop);
+            }
+        }
+    }
+
     public void drawBusLocations(List<Bus> buses, String routeColor) {
         //TODO: Change icon color based on route
         //TODO: Use Symbol Layer for markers so rotation works properly
@@ -221,17 +244,21 @@ public class MapFragment extends SupportMapFragment {
 
     public void clearMap() {
         if (mapboxMap != null) {
-            clearBuses();
+            clearBusesAndStops();
             mapboxMap.clear();
         }
     }
 
-    public void clearBuses() {
+    public void clearBusesAndStops() {
         if (mapboxMap != null) {
             for (Bus b : busesHM.values()) {
                 mapboxMap.removeAnnotation(b.marker);
             }
+            for (BusStop bs : busStopHM.values()) {
+                mapboxMap.removeAnnotation(bs.marker);
+            }
             busesHM.clear();
+            busStopHM.clear();
         }
     }
 
