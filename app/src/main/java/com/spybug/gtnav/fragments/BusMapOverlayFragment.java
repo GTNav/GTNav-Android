@@ -45,6 +45,7 @@ public class BusMapOverlayFragment extends Fragment {
     private Handler handler;
     private final int busDelayms = 15000; //15 seconds
 
+    private boolean routeCreated = false;
     private boolean fabExpanded = false;
     private FloatingActionButton fabSelect;
     private LinearLayout layoutFabBlue, layoutFabRed, layoutFabGreen, layoutFabTrolley, layoutFabMidnight, layoutFabExpress;
@@ -105,9 +106,6 @@ public class BusMapOverlayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bus_map_overlay, container, false);
-
-        getBusRoute(currentRoute);
-        getBusStops(currentRoute);
 
         fabSelect = view.findViewById(R.id.fabSelect);
 
@@ -319,10 +317,6 @@ public class BusMapOverlayFragment extends Fragment {
 
     @Override
     public void onStop() {
-        if (handler != null) {
-            handler.removeCallbacks(busUpdater); //removes all callbacks
-            handler = null;
-        }
         super.onStop();
 
     }
@@ -334,9 +328,20 @@ public class BusMapOverlayFragment extends Fragment {
             handler = new Handler();
         }
 
-        getBusLocations(currentRoute);
-        handler.postDelayed(busUpdater, busDelayms);
+        View view = getView();
+        if (view != null && view.isShown()) {
+            if (!routeCreated) {
+                getBusRoute(currentRoute);
+                routeCreated = true;
+            }
+
+            getBusLocations(currentRoute);
+            getBusStops(currentRoute);
+            handler.postDelayed(busUpdater, busDelayms);
+        }
     }
+
+
 
     /**
      * This interface must be implemented by activities that contain this

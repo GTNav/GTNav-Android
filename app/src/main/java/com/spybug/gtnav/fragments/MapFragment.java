@@ -253,6 +253,7 @@ public class MapFragment extends SupportMapFragment {
     public void clearMap() {
         if (mapboxMap != null) {
             clearBusesAndStops();
+            clearBikeStations();
             mapboxMap.clear();
         }
     }
@@ -267,6 +268,15 @@ public class MapFragment extends SupportMapFragment {
             }
             busesHM.clear();
             busStopHM.clear();
+        }
+    }
+
+    public void clearBikeStations() {
+        if (mapboxMap != null) {
+            for (BikeStation bs : bikeStationsHM.values()) {
+                mapboxMap.removeAnnotation(bs.marker);
+            }
+            bikeStationsHM.clear();
         }
     }
 

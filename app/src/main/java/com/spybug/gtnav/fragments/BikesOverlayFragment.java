@@ -76,9 +76,6 @@ public class BikesOverlayFragment extends Fragment {
             }
         });
 
-        getBikeStations();
-
-
         return view;
     }
 
@@ -113,6 +110,15 @@ public class BikesOverlayFragment extends Fragment {
         //TODO
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View view = getView();
+        if (view != null && view.isShown()) {
+            getBikeStations();
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
