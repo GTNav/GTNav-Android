@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -30,13 +30,17 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
+import com.spybug.gtnav.models.BikeStation;
+import com.spybug.gtnav.models.Bus;
+import com.spybug.gtnav.utils.HelperUtil;
+import com.spybug.gtnav.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.spybug.gtnav.HelperUtil.drawableToBitmap;
-import static com.spybug.gtnav.HelperUtil.rotateBitmap;
+import static com.spybug.gtnav.utils.HelperUtil.drawableToBitmap;
+import static com.spybug.gtnav.utils.HelperUtil.rotateBitmap;
 
 
 public class MapFragment extends SupportMapFragment {

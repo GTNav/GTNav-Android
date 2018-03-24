@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -17,8 +17,13 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.spybug.gtnav.models.Bus;
+import com.spybug.gtnav.utils.BusLocationsServerRequest;
+import com.spybug.gtnav.utils.BusRouteServerRequest;
+import com.spybug.gtnav.interfaces.Communicator;
+import com.spybug.gtnav.interfaces.OnEventListener;
+import com.spybug.gtnav.R;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

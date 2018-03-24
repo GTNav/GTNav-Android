@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -20,7 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.spybug.gtnav.interfaces.Communicator;
+import com.spybug.gtnav.utils.DirectionsServerRequest;
+import com.spybug.gtnav.activities.MainActivity;
+import com.spybug.gtnav.interfaces.OnEventListener;
+import com.spybug.gtnav.R;
 
 
 /**

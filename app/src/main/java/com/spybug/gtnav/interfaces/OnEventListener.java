@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.interfaces;
 
 public interface OnEventListener<T,Q> {
     public void onSuccess(T object);

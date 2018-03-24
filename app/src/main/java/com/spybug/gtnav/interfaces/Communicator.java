@@ -1,6 +1,9 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.interfaces;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.spybug.gtnav.models.BikeStation;
+import com.spybug.gtnav.models.Bus;
+
 import java.util.List;
 
 public interface Communicator {

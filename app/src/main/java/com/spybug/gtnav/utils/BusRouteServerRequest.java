@@ -1,9 +1,13 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.utils;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.commons.utils.PolylineUtils;
+import com.spybug.gtnav.BuildConfig;
+import com.spybug.gtnav.interfaces.OnEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,25 +22,24 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
+import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
 
 
 /**
- * Background task to communicate with the map server
+ * Background task to get a bus route
  */
 
-public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>> {
+public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<LatLng>>> {
 
+    private WeakReference<Context> contextRef;
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
-    private WeakReference<Context> contextRef;
     private boolean hasNetwork = true;
     private int errorCode = 0;
-    private OnEventListener<List<Bus>, String> mCallBack;
+    private OnEventListener<List<List<LatLng>>, String> mCallBack;
 
-    BusLocationsServerRequest(Context context, OnEventListener<List<Bus>, String> callback) {
+    public BusRouteServerRequest(Context context, OnEventListener<List<List<LatLng>>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -46,50 +49,41 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
     }
 
     @Override
-    protected List<Bus> doInBackground(Object[] objects) {
-        List<Bus> busList = new ArrayList<>();
+    protected List<List<LatLng>> doInBackground(Object[] objects) {
+        List<List<LatLng>> points = new ArrayList<>();
         String routeTag = (String)objects[0];
 
         if (!hasNetwork) {
             errorCode = 1;
-            return busList;
+            return points;
         }
 
         String inputLine;
         String stringUrl;
         String result;
 
-        stringUrl = String.format("%sbuses?route=%s",
+        stringUrl = String.format("%sroutes?route=%s",
                 BuildConfig.API_URL,
                 routeTag);
 
         try {
-            //Create a URL object holding our url
+
             URL myUrl = new URL(stringUrl);
-            //Create a connection
-            HttpURLConnection connection =(HttpURLConnection)
-                    myUrl.openConnection();
-            //Set methods and timeouts
+            HttpURLConnection connection = (HttpURLConnection) myUrl.openConnection();
+
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
-
-            //Connect to our url
             connection.connect();
-            //Create a new InputStreamReader
-            InputStreamReader streamReader = new
-                    InputStreamReader(connection.getInputStream());
-            //Create a new buffered reader and String Builder
+
+            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader reader = new BufferedReader(streamReader);
             StringBuilder stringBuilder = new StringBuilder();
-            //Check if the line we are reading is not null
             while((inputLine = reader.readLine()) != null){
                 stringBuilder.append(inputLine);
             }
-            //Close our InputStream and Buffered reader
             reader.close();
             streamReader.close();
-            //Set our result equal to our stringBuilder
             result = stringBuilder.toString();
         }
         catch(IOException e){
@@ -99,25 +93,28 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
 
         if (result != null) {
             try {
-                JSONArray vehicles = new JSONArray(result);
+                JSONObject resultJSON = new JSONObject(result);
+                JSONArray encodedStrings = resultJSON.getJSONArray("route");
+                for (int i = 0; i < encodedStrings.length(); i++) {
+                    List<Position> positionList = PolylineUtils.decode(encodedStrings.getString(i), 5);
+                    List<LatLng> newList = new ArrayList<LatLng>();
 
-                for (int i = 0; i < vehicles.length(); i++) {
-                    JSONObject vehicle = vehicles.getJSONObject(i);
-                    Bus newBus = new Bus(vehicle.getInt("id"),
-                            vehicle.getDouble("lat"), vehicle.getDouble("lon"),
-                            vehicle.getInt("heading"), vehicle.getString("dirTag"));
-                    busList.add(newBus);
+                    // Convert Positions List into List<LatLng>
+                    for (int j = 0; j < positionList.size(); j++) {
+                        newList.add(new LatLng(
+                                positionList.get(j).getLatitude(),
+                                positionList.get(j).getLongitude()));
+                    }
+                    points.add(newList);
                 }
-            }
-            catch(JSONException ex) {
-                ex.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
-
-        return busList;
+        return points;
     }
 
-    protected void onPostExecute(List<Bus> result) {
+    protected void onPostExecute(List<List<LatLng>> result) {
         if (mCallBack != null) {
             if (errorCode != 0) {
                 if (errorCode == 1) {
@@ -125,7 +122,7 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
                     mCallBack.onFailure(info);
                 }
             }
-            else if (result.size() > 0) {
+            else {
                 mCallBack.onSuccess(result);
             }
         }

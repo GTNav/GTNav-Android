@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.activities;
 
 import android.content.Context;
 import android.location.Location;
@@ -11,7 +11,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -32,10 +31,21 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapbox.services.android.telemetry.location.LostLocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+import com.spybug.gtnav.R;
+import com.spybug.gtnav.fragments.BikesOverlayFragment;
+import com.spybug.gtnav.fragments.BottomNavbarFragment;
+import com.spybug.gtnav.fragments.BusMapOverlayFragment;
+import com.spybug.gtnav.fragments.DirectionsMenuFragment;
+import com.spybug.gtnav.fragments.MainMapOverlayFragment;
+import com.spybug.gtnav.fragments.MapFragment;
+import com.spybug.gtnav.fragments.ScheduleFragment;
+import com.spybug.gtnav.interfaces.Communicator;
+import com.spybug.gtnav.models.BikeStation;
+import com.spybug.gtnav.models.Bus;
 
 import java.util.List;
 
-import static com.spybug.gtnav.HelperUtil.convertDpToPixel;
+import static com.spybug.gtnav.utils.HelperUtil.convertDpToPixel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener, Communicator {
@@ -49,6 +59,13 @@ public class MainActivity extends AppCompatActivity
     private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
     private BottomNavbarFragment bottomBarFragment;
+    private enum State {
+        MAIN,
+        DIRECTIONS,
+        BUSES,
+        BIKES
+    }
+
     private State currentState;
 
     private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
@@ -293,14 +310,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    protected Location getLastLocation() {
+    public Location getLastLocation() {
         if (locationPlugin != null) {
             return locationPlugin.getLastKnownLocation();
         }
         return null;
     }
 
-    protected void setCameraPosition(Location location) {
+    public void setCameraPosition(Location location) {
         if (GT_BOUNDS.contains(new LatLng(location.getLatitude(), location.getLongitude()))) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(), location.getLongitude()), 16));

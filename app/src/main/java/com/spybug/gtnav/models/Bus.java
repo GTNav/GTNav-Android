@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.models;
 
 
 import com.mapbox.mapboxsdk.annotations.Marker;

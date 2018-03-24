@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.utils;
 
 import android.animation.TypeEvaluator;
 import android.content.Context;

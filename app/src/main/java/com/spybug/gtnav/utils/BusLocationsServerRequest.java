@@ -1,9 +1,11 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.utils;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.spybug.gtnav.BuildConfig;
+import com.spybug.gtnav.interfaces.OnEventListener;
+import com.spybug.gtnav.models.Bus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,14 +20,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
+
+import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
 
 
 /**
  * Background task to communicate with the map server
  */
 
-public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<BikeStation>> {
+public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -33,9 +36,9 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
     private WeakReference<Context> contextRef;
     private boolean hasNetwork = true;
     private int errorCode = 0;
-    private OnEventListener<List<BikeStation>, String> mCallBack;
+    private OnEventListener<List<Bus>, String> mCallBack;
 
-    BikeStationsServerRequest(Context context, OnEventListener<List<BikeStation>, String> callback) {
+    public BusLocationsServerRequest(Context context, OnEventListener<List<Bus>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -45,40 +48,50 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
     }
 
     @Override
-    protected List<BikeStation> doInBackground(Object[] objects) {
-        List<BikeStation> bikeStations = new ArrayList<>();
+    protected List<Bus> doInBackground(Object[] objects) {
+        List<Bus> busList = new ArrayList<>();
+        String routeTag = (String)objects[0];
 
         if (!hasNetwork) {
             errorCode = 1;
-            return bikeStations;
+            return busList;
         }
 
         String inputLine;
         String stringUrl;
         String result;
 
-        stringUrl = String.format("%sbikes", BuildConfig.API_URL);
+        stringUrl = String.format("%sbuses?route=%s",
+                BuildConfig.API_URL,
+                routeTag);
 
         try {
+            //Create a URL object holding our url
             URL myUrl = new URL(stringUrl);
-            HttpURLConnection connection =(HttpURLConnection) myUrl.openConnection();
-
+            //Create a connection
+            HttpURLConnection connection =(HttpURLConnection)
+                    myUrl.openConnection();
+            //Set methods and timeouts
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
+            //Connect to our url
             connection.connect();
-            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-
+            //Create a new InputStreamReader
+            InputStreamReader streamReader = new
+                    InputStreamReader(connection.getInputStream());
+            //Create a new buffered reader and String Builder
             BufferedReader reader = new BufferedReader(streamReader);
             StringBuilder stringBuilder = new StringBuilder();
+            //Check if the line we are reading is not null
             while((inputLine = reader.readLine()) != null){
                 stringBuilder.append(inputLine);
             }
-
+            //Close our InputStream and Buffered reader
             reader.close();
             streamReader.close();
-
+            //Set our result equal to our stringBuilder
             result = stringBuilder.toString();
         }
         catch(IOException e){
@@ -88,16 +101,14 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
 
         if (result != null) {
             try {
-                JSONArray stations = new JSONArray(result);
+                JSONArray vehicles = new JSONArray(result);
 
-                for (int i = 0; i < stations.length(); i++) {
-                    JSONObject station = stations.getJSONObject(i);
-                    BikeStation newStation = new BikeStation(station.getString("station_id"),
-                            station.getString("name"),
-                            station.getDouble("lat"), station.getDouble("lon"),
-                            station.getInt("num_bikes_available"), station.getInt("num_bikes_disabled"),
-                            station.getInt("num_docks_available"));
-                    bikeStations.add(newStation);
+                for (int i = 0; i < vehicles.length(); i++) {
+                    JSONObject vehicle = vehicles.getJSONObject(i);
+                    Bus newBus = new Bus(vehicle.getInt("id"),
+                            vehicle.getDouble("lat"), vehicle.getDouble("lon"),
+                            vehicle.getInt("heading"), vehicle.getString("dirTag"));
+                    busList.add(newBus);
                 }
             }
             catch(JSONException ex) {
@@ -105,10 +116,10 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
             }
         }
 
-        return bikeStations;
+        return busList;
     }
 
-    protected void onPostExecute(List<BikeStation> result) {
+    protected void onPostExecute(List<Bus> result) {
         if (mCallBack != null) {
             if (errorCode != 0) {
                 if (errorCode == 1) {
@@ -116,7 +127,7 @@ public class BikeStationsServerRequest extends AsyncTask<Object, Void, List<Bike
                     mCallBack.onFailure(info);
                 }
             }
-            else {
+            else if (result.size() > 0) {
                 mCallBack.onSuccess(result);
             }
         }

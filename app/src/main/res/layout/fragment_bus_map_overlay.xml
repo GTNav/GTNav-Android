@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.spybug.gtnav.MainMapOverlayFragment"
+    tools:context="com.spybug.gtnav.fragments.MainMapOverlayFragment"
     android:layout_alignBaseline="@+id/bottom_bar_frame">
 
 

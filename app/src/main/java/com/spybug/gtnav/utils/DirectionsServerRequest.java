@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.utils;
 
 import android.content.Context;
 import android.location.Location;
@@ -10,6 +10,8 @@ import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.commons.utils.PolylineUtils;
+import com.spybug.gtnav.BuildConfig;
+import com.spybug.gtnav.interfaces.OnEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +26,7 @@ import java.util.List;
 
 import retrofit.Response;
 
-import static com.spybug.gtnav.HelperUtil.haveNetworkConnection;
+import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
 
 /**
  * Background task to communicate with the map server
@@ -42,7 +44,7 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
 
     private enum UserLocationUsage {START, END, NONE}
 
-    DirectionsServerRequest(Context context, OnEventListener<LatLng[], String> callback) {
+    public DirectionsServerRequest(Context context, OnEventListener<LatLng[], String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }

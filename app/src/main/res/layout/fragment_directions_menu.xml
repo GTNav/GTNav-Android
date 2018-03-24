@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/directionsBar"
     android:orientation="vertical"
-    tools:context="com.spybug.gtnav.DirectionsMenuFragment">
+    tools:context="com.spybug.gtnav.fragments.DirectionsMenuFragment">
 
     <LinearLayout
         android:background="@android:color/transparent"

@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.spybug.gtnav.activities.MainActivity;
+import com.spybug.gtnav.R;
 
 
 /**

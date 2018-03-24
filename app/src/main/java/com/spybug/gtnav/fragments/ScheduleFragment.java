@@ -1,4 +1,4 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.spybug.gtnav.R;
 
 
 /**

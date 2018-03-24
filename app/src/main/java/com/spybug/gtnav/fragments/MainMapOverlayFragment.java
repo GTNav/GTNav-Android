@@ -1,7 +1,6 @@
-package com.spybug.gtnav;
+package com.spybug.gtnav.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,10 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Switch;
-import android.widget.Toast;
 
-import java.util.List;
+import com.spybug.gtnav.activities.MainActivity;
+import com.spybug.gtnav.R;
 
 
 /**
@@ -23,12 +21,11 @@ import java.util.List;
  * Use the {@link MainMapOverlayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BikesOverlayFragment extends Fragment {
+public class MainMapOverlayFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ImageButton menuButton;
-    private View view;
 
-    public BikesOverlayFragment() {
+    public MainMapOverlayFragment() {
         // Required empty public constructor
     }
 
@@ -41,8 +38,8 @@ public class BikesOverlayFragment extends Fragment {
      * @return A new instance of fragment DirectionsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BikesOverlayFragment newInstance(String param1, String param2) {
-        BikesOverlayFragment fragment = new BikesOverlayFragment();
+    public static MainMapOverlayFragment newInstance(String param1, String param2) {
+        MainMapOverlayFragment fragment = new MainMapOverlayFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -56,58 +53,18 @@ public class BikesOverlayFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_bikes_overlay, container, false);
-        final Switch stationSwitch = view.findViewById(R.id.bike_station_switch);
-        stationSwitch.setOnClickListener(new View.OnClickListener() {
+        View v = inflater.inflate(R.layout.fragment_main_map_overlay, container, false);
+        
+        menuButton = v.findViewById(R.id.search_bar_menubutton);
+        menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!stationSwitch.isChecked()) {
-                    hideBikeStations();
-                    stationSwitch.setText(getString(R.string.show_station_switch_text));
-                } else {
-                    showBikeStations();
-                    stationSwitch.setText(getString(R.string.show_racks_switch_text));
-                }
+                ((MainActivity) getActivity()).openDrawer(); //opens the navigation drawer
             }
         });
 
-        getBikeStations();
-
-
-        return view;
+        return v;
     }
-
-    public void getBikeStations() {
-        new BikeStationsServerRequest(getContext(), new OnEventListener<List<BikeStation>, String>() {
-            @Override
-            public void onSuccess(List<BikeStation> bikeStations) {
-                Communicator communicator = (Communicator) getActivity();
-                if (communicator != null) {
-                    communicator.passBikeStationsToMap(bikeStations);
-                }
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
-            }
-        }).execute();
-    }
-
-    /**
-     * Hides the bike stations on the map and displays the bike rack locations
-     */
-    private void hideBikeStations() {
-        //TODO
-    }
-
-    /**
-     * Hides the bike rack locations on the map and shows the bike stations
-     */
-    private void showBikeStations() {
-        //TODO
-    }
-
 
     @Override
     public void onAttach(Context context) {
