@@ -39,7 +39,6 @@ import com.spybug.gtnav.fragments.DirectionsMenuFragment;
 import com.spybug.gtnav.fragments.MainMapOverlayFragment;
 import com.spybug.gtnav.fragments.MapFragment;
 import com.spybug.gtnav.fragments.ScheduleFragment;
-import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.models.Bus;
 import com.spybug.gtnav.models.BusStop;
@@ -49,7 +48,7 @@ import java.util.List;
 import static com.spybug.gtnav.utils.HelperUtil.convertDpToPixel;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener, Communicator {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationEngineListener, PermissionsListener {
 
     private final static String ROOT_TAG = "root_fragment";
 
@@ -388,32 +387,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
     public void passRouteToMap(LatLng[] points) {
         mapFragment.drawDirectionsRoute(points);
     }
 
-    @Override
     public void passBusRouteToMap(List<List<LatLng>> points, String routeColor) {
         mapFragment.drawBusesRoute(points, routeColor);
     }
 
-    @Override
     public void passBusLocationsToMap(List<Bus> points, String routeColor) {
         mapFragment.drawBusLocations(points, routeColor);
     }
 
-    @Override
     public void passBikeStationsToMap(List<BikeStation> bikeStations) {
         mapFragment.drawBikeStations(bikeStations);
     }
 
-    @Override
     public void passBusStopsToMap(List<BusStop> busStops, String routeColor) {
         mapFragment.drawBusStops(busStops, routeColor);
     }
 
-    @Override
     public void clearBuses() {
         mapFragment.clearBusesAndStops();
     }

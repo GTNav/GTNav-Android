@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.utils.DirectionsServerRequest;
 import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.interfaces.OnEventListener;
@@ -205,34 +204,36 @@ public class DirectionsMenuFragment extends Fragment {
     }
 
     private void makeDirectionsRequest() {
-        Location location = ((MainActivity) getActivity()).getLastLocation();
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) {
+            Location location = activity.getLastLocation();
 
-        if (endLocation != null && startLocation != null) {
-            try {
-                DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<LatLng[], String>() {
-                    @Override
-                    public void onSuccess(LatLng[] points) {
-                        Communicator communicator = (Communicator) getActivity();
-                        if (communicator != null) {
-                            communicator.passRouteToMap(points);
+            if (endLocation != null && startLocation != null) {
+                try {
+                    DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<LatLng[], String>() {
+                        @Override
+                        public void onSuccess(LatLng[] points) {
+                            MainActivity communicator = (MainActivity) getActivity();
+                            if (communicator != null) {
+                                communicator.passRouteToMap(points);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(String message) {
-                        Toast.makeText(v.getContext(), message, Toast.LENGTH_LONG).show();
-                    }
-                });
-                req.execute(startLocation.getText().toString(),
-                        endLocation.getText().toString(),
-                        curSelectedMode.toString(),
-                        location,
-                        getString(R.string.mapbox_key));
+                        @Override
+                        public void onFailure(String message) {
+                            Toast.makeText(v.getContext(), message, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    req.execute(startLocation.getText().toString(),
+                            endLocation.getText().toString(),
+                            curSelectedMode.toString(),
+                            location,
+                            getString(R.string.mapbox_key));
 
-                directionsRequested = true;
-            }
-            catch(Exception e) {
-                e.printStackTrace();
+                    directionsRequested = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -17,11 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.models.Bus;
 import com.spybug.gtnav.models.BusStop;
 import com.spybug.gtnav.utils.BusLocationsServerRequest;
 import com.spybug.gtnav.utils.BusRouteServerRequest;
-import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.interfaces.OnEventListener;
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.utils.BusStopServerRequest;
@@ -159,7 +159,10 @@ public class BusMapOverlayFragment extends Fragment {
                 //if user changed current route
                 if (prevRoute != currentRoute) {
                     handler.removeCallbacks(busUpdater);
-                    ((Communicator) getActivity()).clearBuses();
+                    MainActivity communicator = (MainActivity) getActivity();
+                    if (communicator != null) {
+                        communicator.clearBuses();
+                    }
                     getBusRoute(currentRoute);
                     getBusStops(currentRoute);
                     getBusLocations(currentRoute);
@@ -197,6 +200,7 @@ public class BusMapOverlayFragment extends Fragment {
         @Override
         public void run() {
             getBusLocations(currentRoute);
+            getBusStops(currentRoute);
             //Toast.makeText(view.getContext(), "Making bus request", Toast.LENGTH_SHORT).show(); //For debugging to tell when bus location updated
             handler.postDelayed(busUpdater, busDelayms);
         }
@@ -209,7 +213,7 @@ public class BusMapOverlayFragment extends Fragment {
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
             public void onSuccess(List<Bus> buses) {
-                Communicator communicator = (Communicator) getActivity();
+                MainActivity communicator = (MainActivity) getActivity();
                 if (communicator != null) {
                     communicator.passBusLocationsToMap(buses, fRouteColor);
                 }
@@ -229,7 +233,7 @@ public class BusMapOverlayFragment extends Fragment {
         new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
             @Override
             public void onSuccess(List<List<LatLng>> route) {
-                Communicator communicator = (Communicator) getActivity();
+                MainActivity communicator = (MainActivity) getActivity();
                 if (communicator != null) {
                     communicator.passBusRouteToMap(route, fRouteColor);
                 }
@@ -249,7 +253,7 @@ public class BusMapOverlayFragment extends Fragment {
         new BusStopServerRequest(view.getContext(), new OnEventListener<List<BusStop>, String>() {
             @Override
             public void onSuccess(List<BusStop> stops) {
-                Communicator communicator = (Communicator) getActivity();
+                MainActivity communicator = (MainActivity) getActivity();
                 if (communicator != null) {
                     communicator.passBusStopsToMap(stops, fRouteColor);
                 }

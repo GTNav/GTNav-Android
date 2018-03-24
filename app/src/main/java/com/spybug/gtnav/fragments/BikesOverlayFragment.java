@@ -11,9 +11,9 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.utils.BikeStationsServerRequest;
-import com.spybug.gtnav.interfaces.Communicator;
 import com.spybug.gtnav.interfaces.OnEventListener;
 import com.spybug.gtnav.R;
 
@@ -86,7 +86,7 @@ public class BikesOverlayFragment extends Fragment {
         new BikeStationsServerRequest(getContext(), new OnEventListener<List<BikeStation>, String>() {
             @Override
             public void onSuccess(List<BikeStation> bikeStations) {
-                Communicator communicator = (Communicator) getActivity();
+                MainActivity communicator = (MainActivity) getActivity();
                 if (communicator != null) {
                     communicator.passBikeStationsToMap(bikeStations);
                 }
