@@ -50,6 +50,7 @@ public class MapFragment extends SupportMapFragment {
     public MapView map;
     private MapboxMap mapboxMap;
     private IconFactory iconFactory;
+    private Drawable busStopMarkerDrawable;
     private Icon start_icon, destination_icon, bikestation_icon, busstop_icon;
     private Bitmap bus_icon;
     private String lastRouteColor;
@@ -78,11 +79,11 @@ public class MapFragment extends SupportMapFragment {
         Bitmap start_marker_icon = drawableToBitmap(startMarkerDrawable);
         lastRouteColor = "";
 
+        busStopMarkerDrawable = resources.getDrawable(R.drawable.start_marker);
+
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
-        //bus_icon = iconFactory.defaultMarker();
         bikestation_icon = iconFactory.defaultMarker();
-        busstop_icon = iconFactory.defaultMarker();
 
         busRoutes = new ArrayList<>();
         busesHM = new HashMap<>();
@@ -165,6 +166,8 @@ public class MapFragment extends SupportMapFragment {
     }
 
     public void drawBusStops(List<BusStop> busStops, String routeColor) {
+        Icon busStopIcon = null;
+
         for (BusStop busStop : busStops) {
             BusStop storedBusStop = busStopHM.get(busStop.id);
             if (storedBusStop != null) {
@@ -172,11 +175,16 @@ public class MapFragment extends SupportMapFragment {
                 storedMarker.setSnippet(busStop.toString()); //TODO: Update busStopMarker with new estimation info
             }
             else {
+               if (busStopIcon == null) {
+                   busStopMarkerDrawable.setColorFilter(Color.parseColor(routeColor), PorterDuff.Mode.SRC_ATOP);
+                   busStopIcon = iconFactory.fromBitmap(drawableToBitmap(busStopMarkerDrawable));
+               }
+
                 busStop.marker = mapboxMap.addMarker(new MarkerOptions()
                 .position(busStop.point)
                 .title(busStop.name)
                 .snippet(busStop.toString())
-                .icon(busstop_icon));
+                .icon(busStopIcon));
 
                 busStopHM.put(busStop.id, busStop);
             }
