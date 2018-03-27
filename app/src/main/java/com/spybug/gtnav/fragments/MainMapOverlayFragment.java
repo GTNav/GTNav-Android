@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.R;
@@ -60,6 +61,15 @@ public class MainMapOverlayFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 ((MainActivity) getActivity()).openDrawer(); //opens the navigation drawer
+            }
+        });
+
+        ImageButton reportButton = v.findViewById(R.id.report_button);
+        reportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String popUpText = "This feature is coming soon!";
+                Toast.makeText(view.getContext(), popUpText, Toast.LENGTH_LONG).show();
             }
         });
 
