@@ -3,6 +3,7 @@ package com.spybug.gtnav.activities;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -63,7 +64,8 @@ public class MainActivity extends AppCompatActivity
         MAIN,
         DIRECTIONS,
         BUSES,
-        BIKES
+        BIKES,
+        SCHEDULE
     }
 
     private State currentState;
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_bikes) {
             openBikesFragment();
         } else if (id == R.id.nav_schedule) {
-            newFragment = new ScheduleFragment();
+            openScheduleFragment();
         } else if (id == R.id.nav_settings) {
             newFragment = new ScheduleFragment();
         } else if (id == R.id.nav_faq) {
@@ -233,6 +235,35 @@ public class MainActivity extends AppCompatActivity
             currentState = State.BIKES;
             navMenu.setCheckedItem(R.id.nav_bikes);
             bottomBarFragment.highlightBikes();
+        }
+    }
+
+    public void openScheduleFragment() {
+        if (currentState != State.SCHEDULE) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            if (prevOverlayFragment != null) {
+                transaction.remove(prevOverlayFragment);
+            }
+
+            Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (prevMenuFragment != null) {
+                transaction.remove(prevMenuFragment);
+            }
+
+            Fragment bottomBarFragment = fragmentManager.findFragmentById(R.id.bottom_bar_frame);
+            if (bottomBarFragment != null) {
+                transaction.remove(bottomBarFragment);
+            }
+
+            transaction.replace(R.id.map_frame, new ScheduleFragment());
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
+
+            currentState = State.SCHEDULE;
         }
     }
 
