@@ -90,15 +90,15 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
             result = null;
         }
 
-        if (result != null) {
+        if (result != null && !result.equals("")) {
             try {
                 JSONArray stops = new JSONArray(result);
 
                 for (int i = 0; i < stops.length(); i++) {
                     JSONObject stop = stops.getJSONObject(i);
-                    BusStop newStop = new BusStop(stop.getString("Title"),
+                    BusStop newStop = new BusStop(stop.getString("StopTag"),
                             stop.getString("Title"),
-                            stop.getDouble("Latitude"), stop.getDouble("Longitude"));
+                            stop.getDouble("Latitude"), stop.getDouble("Longitude"), stop.getInt("Prediction"));
                     busStops.add(newStop);
                 }
             }
