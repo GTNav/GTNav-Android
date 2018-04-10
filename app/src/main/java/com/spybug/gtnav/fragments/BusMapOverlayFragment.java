@@ -24,6 +24,7 @@ import com.spybug.gtnav.utils.BusLocationsServerRequest;
 import com.spybug.gtnav.utils.BusRouteServerRequest;
 import com.spybug.gtnav.interfaces.OnEventListener;
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.utils.BusStopPredictionsServerRequest;
 import com.spybug.gtnav.utils.BusStopServerRequest;
 
 import java.util.LinkedList;
@@ -178,7 +179,7 @@ public class BusMapOverlayFragment extends Fragment {
             public void onClick(View view) {
                 if (fabExpanded){
                     ColorStateList color = ColorStateList.valueOf(
-                            Color.parseColor(currentRoute.getColor(getContext())));
+                            Color.parseColor(currentRoute.getColor(view.getContext())));
 
                     closeSubMenusFab(color);
                 } else {
@@ -189,7 +190,7 @@ public class BusMapOverlayFragment extends Fragment {
 
         currentRoute = CurrentRoute.RED; //Default route, will be set based on saved last viewed route later
         closeSubMenusFab(ColorStateList.valueOf(
-                Color.parseColor(currentRoute.getColor(getContext()))));
+                Color.parseColor(currentRoute.getColor(view.getContext()))));
 
         return view;
     }
@@ -198,7 +199,7 @@ public class BusMapOverlayFragment extends Fragment {
         @Override
         public void run() {
             getBusLocations(currentRoute);
-            getBusStops(currentRoute);
+            getBusStopPredictions(currentRoute.toString());
             //Toast.makeText(view.getContext(), "Making bus request", Toast.LENGTH_SHORT).show(); //For debugging to tell when bus location updated
             handler.postDelayed(busUpdater, busDelayms);
         }
@@ -206,7 +207,7 @@ public class BusMapOverlayFragment extends Fragment {
 
     private void getBusLocations(CurrentRoute route) {
         final String fRouteName = route.toString();
-        final String fRouteColor = route.getColor(getContext());
+        final String fRouteColor = route.getColor(view.getContext());
 
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
@@ -225,8 +226,7 @@ public class BusMapOverlayFragment extends Fragment {
     }
 
     private void getBusRoute(CurrentRoute route) {
-        final String fRouteName = route.toString();
-        final String fRouteColor = route.getColor(getContext());
+        final String fRouteColor = route.getColor(view.getContext());
 
         new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
             @Override
@@ -241,12 +241,12 @@ public class BusMapOverlayFragment extends Fragment {
             public void onFailure(String message) {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
-        }).execute(fRouteName);
+        }).execute(route.toString());
     }
 
     public void getBusStops(CurrentRoute route) {
         final String fRouteName = route.toString();
-        final String fRouteColor = route.getColor(getContext());
+        final String fRouteColor = route.getColor(view.getContext());
 
         new BusStopServerRequest(view.getContext(), new OnEventListener<List<BusStop>, String>() {
             @Override
@@ -255,6 +255,7 @@ public class BusMapOverlayFragment extends Fragment {
                 if (communicator != null) {
                     communicator.passBusStopsToMap(stops, fRouteColor);
                 }
+                getBusStopPredictions(fRouteName);
             }
 
             @Override
@@ -262,6 +263,25 @@ public class BusMapOverlayFragment extends Fragment {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
         }).execute(fRouteName);
+    }
+
+    public void getBusStopPredictions(String routeName) {
+
+        new BusStopPredictionsServerRequest(view.getContext(), new OnEventListener<List<BusStop>, String>() {
+            @Override
+            public void onSuccess(List<BusStop> stops) {
+                MainActivity communicator = (MainActivity) getActivity();
+                if (communicator != null) {
+                    communicator.passBusStopPredictionsToMap(stops);
+                }
+            }
+
+            @Override
+            public void onFailure(String object) {
+
+            }
+        }).execute(routeName);
+
     }
 
     //closes FAB submenus

@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 
 import com.spybug.gtnav.BuildConfig;
 import com.spybug.gtnav.interfaces.OnEventListener;
-import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.models.BusStop;
+import com.spybug.gtnav.models.BusStopPrediction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +28,7 @@ import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
  * Background task to communicate with the map server
  */
 
-public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>> {
+public class BusStopPredictionsServerRequest extends AsyncTask<Object, Void, List<BusStop>> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -38,7 +38,7 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
     private int errorCode = 0;
     private OnEventListener<List<BusStop>, String> mCallBack;
 
-    public BusStopServerRequest(Context context, OnEventListener<List<BusStop>, String> callback) {
+    public BusStopPredictionsServerRequest(Context context, OnEventListener<List<BusStop>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -49,19 +49,19 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
 
     @Override
     protected List<BusStop> doInBackground(Object[] objects) {
-        List<BusStop> busStops = new ArrayList<>();
+        List<BusStop> busStopPredictions = new ArrayList<>();
         String routeName = (String) objects[0];
 
         if (!hasNetwork) {
             errorCode = 1;
-            return busStops;
+            return busStopPredictions;
         }
 
         String inputLine;
         String stringUrl;
         String result;
 
-        stringUrl = String.format("%sstops?route=%s", BuildConfig.API_URL, routeName);
+        stringUrl = String.format("%spredictions?route=%s", BuildConfig.API_URL, routeName);
 
         try {
             URL myUrl = new URL(stringUrl);
@@ -96,10 +96,17 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
 
                 for (int i = 0; i < stops.length(); i++) {
                     JSONObject stop = stops.getJSONObject(i);
-                    BusStop newStop = new BusStop(stop.getString("StopTag"),
-                            stop.getString("Title"),
-                            stop.getDouble("Latitude"), stop.getDouble("Longitude"));
-                    busStops.add(newStop);
+
+                    //Convert JSONArray to ArrayList
+                    JSONArray predictions = stop.getJSONArray("Prediction");
+                    List<Integer> predictionsList = new ArrayList<>();
+                    for (int j = 0; j < predictions.length(); j++) {
+                        predictionsList.add(predictions.getInt(j));
+                    }
+
+                    BusStop newStop = new BusStopPrediction(stop.getString("StopTag"),
+                                                            predictionsList);
+                    busStopPredictions.add(newStop);
                 }
             }
             catch(JSONException ex) {
@@ -107,7 +114,7 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
             }
         }
 
-        return busStops;
+        return busStopPredictions;
     }
 
     protected void onPostExecute(List<BusStop> result) {

@@ -438,6 +438,10 @@ public class MainActivity extends AppCompatActivity
         mapFragment.drawBusStops(busStops, routeColor);
     }
 
+    public void passBusStopPredictionsToMap(List<BusStop> busStopPredictions) {
+        mapFragment.updateBusStops(busStopPredictions);
+    }
+
     public void clearBuses() {
         mapFragment.clearBusesAndStops();
     }

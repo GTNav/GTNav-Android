@@ -240,6 +240,17 @@ public class MapFragment extends SupportMapFragment {
         }
     }
 
+    public void updateBusStops(List<BusStop> busStopPredictions) {
+        for (BusStop busStopPrediction : busStopPredictions) {
+            BusStop storedBusStop = busStopHM.get(busStopPrediction.id);
+            if (storedBusStop != null) {
+                storedBusStop.estimation_times = busStopPrediction.estimation_times;
+                Marker storedMarker = storedBusStop.marker;
+                storedMarker.setSnippet(busStopPrediction.toString());
+            }
+        }
+    }
+
     private Bitmap getBusIcon(String routeColor) {
         if (!routeColor.equals(lastRouteColor)) {
             Drawable icon_drawable = getResources().getDrawable(R.drawable.bus_icon_master).mutate();
