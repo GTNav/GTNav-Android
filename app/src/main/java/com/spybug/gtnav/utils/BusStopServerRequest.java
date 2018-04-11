@@ -97,7 +97,7 @@ public class BusStopServerRequest extends AsyncTask<Object, Void, List<BusStop>>
                 for (int i = 0; i < stops.length(); i++) {
                     JSONObject stop = stops.getJSONObject(i);
                     BusStop newStop = new BusStop(stop.getString("StopTag"),
-                            stop.getString("Title"),
+                            stop.getString("Title"), routeName,
                             stop.getDouble("Latitude"), stop.getDouble("Longitude"));
                     busStops.add(newStop);
                 }

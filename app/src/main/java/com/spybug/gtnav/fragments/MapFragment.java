@@ -192,7 +192,6 @@ public class MapFragment extends SupportMapFragment {
     }
 
     public void drawBusLocations(List<Bus> buses, String routeColor) {
-        //TODO: Change icon color based on route
         //TODO: Use Symbol Layer for markers so rotation works properly
         // https://www.mapbox.com/android-docs/api/map-sdk/5.2.1/com/mapbox/mapboxsdk/style/layers/SymbolLayer.html
 
@@ -243,7 +242,7 @@ public class MapFragment extends SupportMapFragment {
     public void updateBusStops(List<BusStop> busStopPredictions) {
         for (BusStop busStopPrediction : busStopPredictions) {
             BusStop storedBusStop = busStopHM.get(busStopPrediction.id);
-            if (storedBusStop != null) {
+            if (storedBusStop != null && storedBusStop.routeName.equals(busStopPrediction.routeName)) {
                 storedBusStop.estimation_times = busStopPrediction.estimation_times;
                 Marker storedMarker = storedBusStop.marker;
                 storedMarker.setSnippet(busStopPrediction.toString());

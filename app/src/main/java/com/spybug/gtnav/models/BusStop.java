@@ -9,15 +9,16 @@ import java.util.List;
 
 public class BusStop {
 
-    public String id, name;
+    public String id, name, routeName;
     public LatLng point;
     public Marker marker;
     public List<Integer> estimation_times;
 
-    public BusStop(String id, String name, double lat, double lon) {
+    public BusStop(String id, String name, String routeName, double lat, double lon) {
         this.id = id;
         this.name = name;
         this.point = new LatLng(lat, lon);
+        this.routeName = routeName;
         estimation_times = new ArrayList<>();
     }
 

@@ -104,7 +104,7 @@ public class BusStopPredictionsServerRequest extends AsyncTask<Object, Void, Lis
                         predictionsList.add(predictions.getInt(j));
                     }
 
-                    BusStop newStop = new BusStopPrediction(stop.getString("StopTag"),
+                    BusStop newStop = new BusStopPrediction(stop.getString("StopTag"), routeName,
                                                             predictionsList);
                     busStopPredictions.add(newStop);
                 }
