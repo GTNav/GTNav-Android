@@ -8,7 +8,7 @@ public class ScheduleEvent {
     private String time;
     private LatLng location;
 
-    ScheduleEvent(String name, String time, LatLng location, String[] recurringDays) {
+    public ScheduleEvent(String name, String time, LatLng location, String[] recurringDays) {
         this.name = name;
         this.time = time;
         this.location = location;
@@ -29,5 +29,17 @@ public class ScheduleEvent {
 
     public LatLng getLocation() {
         return location;
+    }
+
+    @Override
+    public String toString() {
+        String rDays = "";
+        for (String day : this.recurringDays) {
+            if (!rDays.equals("")) {
+                rDays = rDays + " ";
+            }
+            rDays = rDays + day;
+        }
+        return this.name + " at " + this.time + "\non " + rDays;
     }
 }

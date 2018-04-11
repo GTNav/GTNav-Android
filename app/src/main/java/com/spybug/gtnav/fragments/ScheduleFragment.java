@@ -70,7 +70,7 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        eventList = new ArrayList<>();
+        eventList = testEvents(); //new ArrayList<>();
         scheduleView = v.findViewById(R.id.ScheduleListView);
         FloatingActionButton addFab = v.findViewById(R.id.AddToScheduleFAB);
 
@@ -89,12 +89,25 @@ public class ScheduleFragment extends Fragment {
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventList.add(addEvent());
+                //eventList.add(addEvent());
                 Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_LONG).show();
             }
         });
 
         return v;
+    }
+
+    //Testing the List View
+    private ArrayList<ScheduleEvent> testEvents() {
+        ArrayList<ScheduleEvent> events = new ArrayList<>();
+        String[] dow = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+
+        events.add(new ScheduleEvent("Event 1", "3:00pm", null, dow));
+        events.add(new ScheduleEvent("Event 2", "5:00pm", null, dow));
+        events.add(new ScheduleEvent("Event 3", "1:30am", null, dow));
+        events.add(new ScheduleEvent("Event 4", "2:22am", null, dow));
+
+        return events;
     }
 
     private ScheduleEvent addEvent() {
