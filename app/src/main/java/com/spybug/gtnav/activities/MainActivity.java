@@ -37,9 +37,12 @@ import com.spybug.gtnav.fragments.BikesOverlayFragment;
 import com.spybug.gtnav.fragments.BottomNavbarFragment;
 import com.spybug.gtnav.fragments.BusMapOverlayFragment;
 import com.spybug.gtnav.fragments.DirectionsMenuFragment;
+import com.spybug.gtnav.fragments.FaqFragment;
+import com.spybug.gtnav.fragments.FeedbackFragment;
 import com.spybug.gtnav.fragments.MainMapOverlayFragment;
 import com.spybug.gtnav.fragments.MapFragment;
 import com.spybug.gtnav.fragments.ScheduleFragment;
+import com.spybug.gtnav.fragments.SettingsFragment;
 import com.spybug.gtnav.models.BikeStation;
 import com.spybug.gtnav.models.Bus;
 import com.spybug.gtnav.models.BusStop;
@@ -65,7 +68,10 @@ public class MainActivity extends AppCompatActivity
         DIRECTIONS,
         BUSES,
         BIKES,
-        SCHEDULE
+        SCHEDULE,
+        SETTINGS,
+        FAQ,
+        FEEDBACK
     }
 
     private State currentState;
@@ -166,11 +172,11 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_schedule) {
             openScheduleFragment();
         } else if (id == R.id.nav_settings) {
-            newFragment = new ScheduleFragment();
+            openSettingsFragment();
         } else if (id == R.id.nav_faq) {
-            newFragment = new ScheduleFragment();
+            openFaqFragment();
         } else if (id == R.id.nav_feedback) {
-            newFragment = new ScheduleFragment();
+            openFeedbackFragment();
         } else {
             newFragment = new ScheduleFragment();
         }
@@ -264,6 +270,93 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
 
             currentState = State.SCHEDULE;
+        }
+    }
+
+    public void openSettingsFragment() {
+        if (currentState != State.SETTINGS) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            if (prevOverlayFragment != null) {
+                transaction.remove(prevOverlayFragment);
+            }
+
+            Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (prevMenuFragment != null) {
+                transaction.remove(prevMenuFragment);
+            }
+
+            Fragment bottomBarFragment = fragmentManager.findFragmentById(R.id.bottom_bar_frame);
+            if (bottomBarFragment != null) {
+                transaction.remove(bottomBarFragment);
+            }
+
+            transaction.replace(R.id.map_frame, new SettingsFragment());
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
+
+            currentState = State.SETTINGS;
+        }
+    }
+
+    public void openFaqFragment() {
+        if (currentState != State.FAQ) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            if (prevOverlayFragment != null) {
+                transaction.remove(prevOverlayFragment);
+            }
+
+            Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (prevMenuFragment != null) {
+                transaction.remove(prevMenuFragment);
+            }
+
+            Fragment bottomBarFragment = fragmentManager.findFragmentById(R.id.bottom_bar_frame);
+            if (bottomBarFragment != null) {
+                transaction.remove(bottomBarFragment);
+            }
+
+            transaction.replace(R.id.map_frame, new FaqFragment());
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
+
+            currentState = State.FAQ;
+        }
+    }
+
+    public void openFeedbackFragment() {
+        if (currentState != State.FEEDBACK) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
+            if (prevOverlayFragment != null) {
+                transaction.remove(prevOverlayFragment);
+            }
+
+            Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
+            if (prevMenuFragment != null) {
+                transaction.remove(prevMenuFragment);
+            }
+
+            Fragment bottomBarFragment = fragmentManager.findFragmentById(R.id.bottom_bar_frame);
+            if (bottomBarFragment != null) {
+                transaction.remove(bottomBarFragment);
+            }
+
+            transaction.replace(R.id.map_frame, new FeedbackFragment());
+            transaction.addToBackStack(ROOT_TAG);
+            transaction.commit();
+
+            currentState = State.FEEDBACK;
         }
     }
 
