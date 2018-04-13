@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Settings">
+
+        <CheckBoxPreference
+            android:key="location_preference"
+            android:title="Location Preferences"
+            android:summary="Enable the use of my location in the application."/>
+
+        <ListPreference
+            android:key="routing_preference"
+            android:title="Routing mode"
+            android:defaultValue="1"
+            android:summary="%s"
+            android:entries="@array/entries_routing_preference"
+            android:entryValues="@array/entryvalues_routing_preference"
+            android:dialogTitle="Please choose a default routing mode for directions" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
