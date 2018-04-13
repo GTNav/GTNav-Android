@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 import com.spybug.gtnav.R;
 
@@ -29,6 +30,7 @@ public class FaqFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private WebView faqWebview;
 
     public FaqFragment() {
         // Required empty public constructor
@@ -65,7 +67,9 @@ public class FaqFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_faq, container, false);
+        View view = inflater.inflate(R.layout.fragment_faq, container, false);
+        faqWebview = view.findViewById(R.id.faq_webview);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
