@@ -511,11 +511,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void passRouteToMap(LatLng[] points) {
+    public void passRouteToMap(List<LatLng> points) {
         mapFragment.drawDirectionsRoute(points);
     }
 
-    public void passBusRouteToMap(List<List<LatLng>> points, String routeColor) {
+    public void passBusRouteToMap(List<LatLng> points, String routeColor) {
         mapFragment.drawBusesRoute(points, routeColor);
     }
 

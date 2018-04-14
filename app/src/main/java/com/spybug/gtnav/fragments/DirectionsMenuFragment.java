@@ -25,6 +25,8 @@ import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.interfaces.OnEventListener;
 import com.spybug.gtnav.R;
 
+import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -210,9 +212,9 @@ public class DirectionsMenuFragment extends Fragment {
 
             if (endLocation != null && startLocation != null) {
                 try {
-                    DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<LatLng[], String>() {
+                    DirectionsServerRequest req = new DirectionsServerRequest(v.getContext(), new OnEventListener<List<LatLng>, String>() {
                         @Override
-                        public void onSuccess(LatLng[] points) {
+                        public void onSuccess(List<LatLng> points) {
                             MainActivity communicator = (MainActivity) getActivity();
                             if (communicator != null) {
                                 communicator.passRouteToMap(points);

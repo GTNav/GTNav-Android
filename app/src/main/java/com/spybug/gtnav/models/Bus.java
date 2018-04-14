@@ -10,9 +10,11 @@ public class Bus {
     public LatLng point;
     public String dirTag;
     public Marker marker;
+    public String routeName;
 
-    public Bus(int id, double lat, double lon, int heading, String dirTag) {
+    public Bus(int id, String routeName, double lat, double lon, int heading, String dirTag) {
         this.id = id;
+        this.routeName = routeName;
         this.point = new LatLng(lat, lon);
         this.heading = heading;
         this.dirTag = dirTag;

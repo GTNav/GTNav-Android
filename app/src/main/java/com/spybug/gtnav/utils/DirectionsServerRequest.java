@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Response;
@@ -32,7 +33,7 @@ import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
  * Background task to communicate with the map server
  */
 
-public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
+public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng>> {
 
     private static final String REQUEST_METHOD = "GET";
     private static final int READ_TIMEOUT = 15000;
@@ -40,11 +41,11 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
     private WeakReference<Context> contextRef;
     private boolean hasNetwork = true;
     private int errorCode = 0;
-    private OnEventListener<LatLng[], String> mCallBack;
+    private OnEventListener<List<LatLng>, String> mCallBack;
 
     private enum UserLocationUsage {START, END, NONE}
 
-    public DirectionsServerRequest(Context context, OnEventListener<LatLng[], String> callback) {
+    public DirectionsServerRequest(Context context, OnEventListener<List<LatLng>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -54,8 +55,8 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
     }
 
     @Override
-    protected LatLng[] doInBackground(Object[] objects) {
-        LatLng[] points = new LatLng[0];
+    protected List<LatLng> doInBackground(Object[] objects) {
+        List<LatLng> points = new ArrayList<>();
 
         if (!hasNetwork) {
             errorCode = 1;
@@ -207,12 +208,9 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
                     routeGeometry = directionsResultJson.getJSONArray("routes").getJSONObject(0).getString("geometry");
                     List<Position> positionList =  PolylineUtils.decode(routeGeometry, 5);
 
-                    // Convert Positions List into LatLng[]
-                    points = new LatLng[positionList.size()];
-                    for (int i = 0; i < positionList.size(); i++) {
-                        points[i] = new LatLng(
-                                positionList.get(i).getLatitude(),
-                                positionList.get(i).getLongitude());
+                    // Convert Positions List into LatLng
+                    for (Position pos : positionList) {
+                        points.add(new LatLng(pos.getLatitude(), pos.getLongitude()));
                     }
                 }
                 catch(JSONException ex) {
@@ -229,7 +227,7 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, LatLng[]> {
         return points;
     }
 
-    protected void onPostExecute(LatLng[] result) {
+    protected void onPostExecute(List<LatLng> result) {
         if (mCallBack != null) {
             if (errorCode != 0) {
                 if (errorCode == 1) {

@@ -29,7 +29,7 @@ import static com.spybug.gtnav.utils.HelperUtil.haveNetworkConnection;
  * Background task to get a bus route
  */
 
-public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<LatLng>>> {
+public class BusRouteServerRequest extends AsyncTask<Object, Void, List<LatLng>> {
 
     private WeakReference<Context> contextRef;
     private static final String REQUEST_METHOD = "GET";
@@ -37,9 +37,9 @@ public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<Lat
     private static final int CONNECTION_TIMEOUT = 15000;
     private boolean hasNetwork = true;
     private int errorCode = 0;
-    private OnEventListener<List<List<LatLng>>, String> mCallBack;
+    private OnEventListener<List<LatLng>, String> mCallBack;
 
-    public BusRouteServerRequest(Context context, OnEventListener<List<List<LatLng>>, String> callback) {
+    public BusRouteServerRequest(Context context, OnEventListener<List<LatLng>, String> callback) {
         contextRef = new WeakReference<>(context);
         mCallBack = callback;
     }
@@ -49,8 +49,8 @@ public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<Lat
     }
 
     @Override
-    protected List<List<LatLng>> doInBackground(Object[] objects) {
-        List<List<LatLng>> points = new ArrayList<>();
+    protected List<LatLng> doInBackground(Object[] objects) {
+        List<LatLng> points = new ArrayList<>();
         String routeTag = (String)objects[0];
 
         if (!hasNetwork) {
@@ -94,19 +94,15 @@ public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<Lat
         if (result != null) {
             try {
                 JSONObject resultJSON = new JSONObject(result);
-                JSONArray encodedStrings = resultJSON.getJSONArray("route");
-                for (int i = 0; i < encodedStrings.length(); i++) {
-                    List<Position> positionList = PolylineUtils.decode(encodedStrings.getString(i), 5);
-                    List<LatLng> newList = new ArrayList<LatLng>();
+                String encodedString = resultJSON.getString("route");
 
-                    // Convert Positions List into List<LatLng>
-                    for (int j = 0; j < positionList.size(); j++) {
-                        newList.add(new LatLng(
-                                positionList.get(j).getLatitude(),
-                                positionList.get(j).getLongitude()));
-                    }
-                    points.add(newList);
+                List<Position> positionList = PolylineUtils.decode(encodedString, 5);
+
+                // Convert Positions List into LatLng
+                for (Position pos : positionList) {
+                    points.add(new LatLng(pos.getLatitude(), pos.getLongitude()));
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -114,7 +110,7 @@ public class BusRouteServerRequest extends AsyncTask<Object, Void, List<List<Lat
         return points;
     }
 
-    protected void onPostExecute(List<List<LatLng>> result) {
+    protected void onPostExecute(List<LatLng> result) {
         if (mCallBack != null) {
             if (errorCode != 0) {
                 if (errorCode == 1) {

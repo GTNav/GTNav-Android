@@ -50,7 +50,7 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
     @Override
     protected List<Bus> doInBackground(Object[] objects) {
         List<Bus> busList = new ArrayList<>();
-        String routeTag = (String)objects[0];
+        String routeName = (String)objects[0];
 
         if (!hasNetwork) {
             errorCode = 1;
@@ -63,7 +63,7 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
 
         stringUrl = String.format("%sbuses?route=%s",
                 BuildConfig.API_URL,
-                routeTag);
+                routeName);
 
         try {
             //Create a URL object holding our url
@@ -105,7 +105,7 @@ public class BusLocationsServerRequest extends AsyncTask<Object, Void, List<Bus>
 
                 for (int i = 0; i < vehicles.length(); i++) {
                     JSONObject vehicle = vehicles.getJSONObject(i);
-                    Bus newBus = new Bus(vehicle.getInt("id"),
+                    Bus newBus = new Bus(vehicle.getInt("id"), routeName,
                             vehicle.getDouble("lat"), vehicle.getDouble("lon"),
                             vehicle.getInt("heading"), vehicle.getString("dirTag"));
                     busList.add(newBus);

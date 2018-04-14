@@ -55,7 +55,7 @@ public class MapFragment extends SupportMapFragment {
     private Bitmap bus_icon;
     private String lastRouteColor;
 
-    private List<Polyline> busRoutes;
+    private Polyline busRoute;
     private HashMap<Integer, Bus> busesHM;
     private HashMap<String, BusStop> busStopHM;
     private HashMap<String, BikeStation> bikeStationsHM;
@@ -85,7 +85,7 @@ public class MapFragment extends SupportMapFragment {
         destination_icon = iconFactory.defaultMarker();
         bikestation_icon = iconFactory.defaultMarker();
 
-        busRoutes = new ArrayList<>();
+        busRoute = null;
         busesHM = new HashMap<>();
         busStopHM = new HashMap<>();
         bikeStationsHM = new HashMap<>();
@@ -111,18 +111,18 @@ public class MapFragment extends SupportMapFragment {
         }
     }
 
-    public void drawDirectionsRoute(LatLng[] points) {
-        if (mapboxMap != null) {
+    public void drawDirectionsRoute(List<LatLng> points) {
+        if (mapboxMap != null && !points.isEmpty()) {
             mapboxMap.clear();
             //Draw Points on Map
             mapboxMap.addPolyline(new PolylineOptions()
-                    .add(points)
+                    .addAll(points)
                     .alpha(0.8f)
                     .color(Color.parseColor("#20BEFB"))
                     .width(4));
 
-            LatLng firstPoint = points[0];
-            LatLng lastPoint = points[points.length - 1];
+            LatLng firstPoint = points.get(0);
+            LatLng lastPoint = points.get(points.size() - 1);
 
             LatLngBounds latLngBounds = new LatLngBounds.Builder()
                     .include(firstPoint)
@@ -143,26 +143,23 @@ public class MapFragment extends SupportMapFragment {
         }
     }
 
-    public void drawBusesRoute(List<List<LatLng>> points, String routeColor) {
-        if (busRoutes.size() > 0) {
-            for (Polyline route : busRoutes) {
-                route.remove();
+    public void drawBusesRoute(List<LatLng> points, String routeColor) {
+        if (mapboxMap != null && !points.isEmpty()) {
+            LatLngBounds.Builder routeBounds = new LatLngBounds.Builder();
+            routeBounds.includes(points);
+
+            if (busRoute != null) {
+                busRoute.remove();
             }
+
+            busRoute = mapboxMap.addPolyline(new PolylineOptions()
+                                .addAll(points)
+                                .color(Color.parseColor(routeColor))
+                                .alpha(0.6f)
+                                .width(4));
+
+            mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds.build(), 100));
         }
-
-        LatLngBounds.Builder routeBounds = new LatLngBounds.Builder();
-
-        for (List<LatLng> pointList : points) {
-            busRoutes.add(mapboxMap.addPolyline(new PolylineOptions()
-                    .addAll(pointList)
-                    .color(Color.parseColor(routeColor))
-                    .alpha(0.6f)
-                    .width(4)));
-
-            routeBounds.includes(pointList);
-        }
-
-        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(routeBounds.build(), 100));
     }
 
     public void drawBusStops(List<BusStop> busStops, String routeColor) {

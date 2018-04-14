@@ -212,9 +212,11 @@ public class BusMapOverlayFragment extends Fragment {
         new BusLocationsServerRequest(view.getContext(), new OnEventListener<List<Bus>, String>() {
             @Override
             public void onSuccess(List<Bus> buses) {
-                MainActivity communicator = (MainActivity) getActivity();
-                if (communicator != null) {
-                    communicator.passBusLocationsToMap(buses, fRouteColor);
+                if (!buses.isEmpty() && buses.get(0).routeName.equals(currentRoute.toString())) {
+                    MainActivity communicator = (MainActivity) getActivity();
+                    if (communicator != null) {
+                        communicator.passBusLocationsToMap(buses, fRouteColor);
+                    }
                 }
             }
 
@@ -228,12 +230,14 @@ public class BusMapOverlayFragment extends Fragment {
     private void getBusRoute(CurrentRoute route) {
         final String fRouteColor = route.getColor(view.getContext());
 
-        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<List<LatLng>>, String>() {
+        new BusRouteServerRequest(view.getContext(), new OnEventListener<List<LatLng>, String>() {
             @Override
-            public void onSuccess(List<List<LatLng>> route) {
-                MainActivity communicator = (MainActivity) getActivity();
-                if (communicator != null) {
-                    communicator.passBusRouteToMap(route, fRouteColor);
+            public void onSuccess(List<LatLng> route) {
+                if (!route.isEmpty()) {
+                    MainActivity communicator = (MainActivity) getActivity();
+                    if (communicator != null) {
+                        communicator.passBusRouteToMap(route, fRouteColor);
+                    }
                 }
             }
 
@@ -251,11 +255,13 @@ public class BusMapOverlayFragment extends Fragment {
         new BusStopServerRequest(view.getContext(), new OnEventListener<List<BusStop>, String>() {
             @Override
             public void onSuccess(List<BusStop> stops) {
-                MainActivity communicator = (MainActivity) getActivity();
-                if (communicator != null) {
-                    communicator.passBusStopsToMap(stops, fRouteColor);
+                if (!stops.isEmpty() && stops.get(0).routeName.equals(currentRoute.toString())) {
+                    MainActivity communicator = (MainActivity) getActivity();
+                    if (communicator != null) {
+                        communicator.passBusStopsToMap(stops, fRouteColor);
+                    }
+                    getBusStopPredictions(fRouteName);
                 }
-                getBusStopPredictions(fRouteName);
             }
 
             @Override
