@@ -41,6 +41,12 @@
     <string name="routing_bus">Buses</string>
     <string name="allow_location">Allow Location</string>
 
+    <!--Feedback Strings-->
+    <string name="email_text">Email (optional):</string>
+    <string name="type_text">Issue Type</string>
+    <string name="details_text">Additional Information</string>
+    <string name="feedback_submit">Submit</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>

@@ -7,8 +7,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.spybug.gtnav.R;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +38,12 @@ public class FeedbackFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private List<String> typeList = new ArrayList<>();
+    private EditText emailText;
+    private EditText detailsText;
+    private Spinner fTypeSpinner;
+    private Button fSubmitButton;
 
     public FeedbackFragment() {
         // Required empty public constructor
@@ -59,13 +74,52 @@ public class FeedbackFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        typeList.add("Navigation");
+        typeList.add("Buses");
+        typeList.add("Bikes");
+        typeList.add("Crashing");
+        typeList.add("Other");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_feedback, container, false);
+        View view = inflater.inflate(R.layout.fragment_feedback, container, false);
+
+        emailText = view.findViewById(R.id.emailText);
+        detailsText = view.findViewById(R.id.detailsText);
+        fTypeSpinner = view.findViewById(R.id.feedbackType);
+        fSubmitButton = view.findViewById(R.id.submitButton);
+
+        fTypeSpinner.setPrompt("Select one...");
+        fTypeSpinner.setAdapter(new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, typeList));
+
+        fSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String typeSelection = (String) fTypeSpinner.getSelectedItem();
+                if (!submitFeedback(emailText.getText().toString(), typeSelection,
+                        detailsText.getText().toString())) {
+                    Toast.makeText(v.getContext(), "Issue type and additional information are required", Toast.LENGTH_LONG).show();
+                }
+                emailText.setText("");
+                detailsText.setText("");
+                fTypeSpinner.setSelection(0);
+                Toast.makeText(v.getContext(), "Feedback sent", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        return view;
+    }
+
+    //Submits the feedback from the form
+    private boolean submitFeedback(String email, String type, String details) {
+        if (type.equals("") || details.equals("")) {
+            return false;
+        }
+        //TODO
+        return true;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
