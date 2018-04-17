@@ -274,7 +274,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void openSettingsFragment() {
-        if (currentState != State.SETTINGS) {
+        //Temporarily don't open settings page since it messes up on phones
+        Toast.makeText(getBaseContext(), "This page will be implemented soon!", Toast.LENGTH_SHORT).show();
+        if (currentState == State.SETTINGS) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
