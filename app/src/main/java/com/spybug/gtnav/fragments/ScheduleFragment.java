@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +90,7 @@ public class ScheduleFragment extends Fragment {
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addEvent();
                 //eventList.add(addEvent());
                 Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_LONG).show();
             }
@@ -111,11 +113,20 @@ public class ScheduleFragment extends Fragment {
     }
 
     private ScheduleEvent addEvent() {
-        ArrayAdapter<ScheduleEvent> listAdapter =
-                new ArrayAdapter<>(ScheduleFragment.this.getContext(),
-                        android.R.layout.simple_list_item_1, eventList);
-        scheduleView.setAdapter(listAdapter);
+        DialogFragment addEventFragment = new AddScheduleEventFragment();
+        addEventFragment.show(getActivity().getSupportFragmentManager(), "AddScheduleEvent");
         return null;
+    }
+
+    // The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the NoticeDialogFragment.NoticeDialogListener interface
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Toast.makeText(getContext(), "Sure thing my dude", Toast.LENGTH_LONG).show();
+    }
+
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
     }
 
     // TODO: Rename method, update argument and hook method into UI event

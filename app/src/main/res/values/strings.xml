@@ -24,7 +24,7 @@
     <string name="current_location">Current Location</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Search&#8230;</string>
-    
+
     <!--Bus Route Strings-->
     <string name="blue_route">Blue Route</string>
     <string name="red_route">Red Route</string>
@@ -32,7 +32,7 @@
     <string name="tech_trolley">Tech Trolley</string>
     <string name="midnight_rambler">Midnight Rambler</string>
     <string name="tech_express">Tech Express</string>
-    
+
     <!--Settings Strings-->
     <string name="setting_title"><b>Settings</b></string>
     <string name="default_routing">Default Routing Method</string>
@@ -46,6 +46,22 @@
     <string name="type_text">Issue Type</string>
     <string name="details_text">Additional Information</string>
     <string name="feedback_submit">Submit</string>
+
+    <!--Scheduling Strings-->
+    <string name="dialog_title">Add Event</string>
+    <string name="name_prompt">Event name</string>
+    <string name="location_prompt">Enter location</string>
+    <string name="time_prompt">Select a time</string>
+    <string name="repeat_prompt">Select repeated days</string>
+    <string name="sunday">SUN</string>
+    <string name="monday">M</string>
+    <string name="tuesday">T</string>
+    <string name="wednesday">W</string>
+    <string name="thursday">R</string>
+    <string name="friday">F</string>
+    <string name="saturday">SAT</string>
+    <string name="submit_creation">OK</string>
+    <string name="cancel_creation">Cancel</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

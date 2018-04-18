@@ -2,7 +2,6 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical">
 
         <TableLayout
@@ -17,7 +16,7 @@
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Event Name" />
+                    android:hint="@string/name_prompt" />
             </TableRow>
 
             <TableRow
@@ -28,7 +27,7 @@
                     android:id="@+id/location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Event Location" />
+                    android:hint="@string/location_prompt" />
             </TableRow>
 
             <TableRow
@@ -38,13 +37,23 @@
                 <TimePicker
                     android:id="@+id/simpleTimePicker"
                     android:layout_width="wrap_content"
-                    android:layout_height="340dp"
+                    android:layout_height="360dp"
                     android:timePickerMode="clock" />
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/repeat_prompt"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -56,93 +65,58 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1.14"
-                        android:text="SUN" />
+                        android:text="@string/sunday" />
 
                     <CheckBox
                         android:id="@+id/checkBox8"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.9"
-                        android:text="M" />
+                        android:text="@string/monday" />
 
                     <CheckBox
                         android:id="@+id/checkBox5"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.9"
-                        android:text="T" />
+                        android:text="@string/tuesday" />
 
                     <CheckBox
                         android:id="@+id/checkBox6"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.9"
-                        android:text="W" />
+                        android:text="@string/wednesday" />
 
                     <CheckBox
                         android:id="@+id/checkBox3"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.9"
-                        android:text="R" />
+                        android:text="@string/thursday" />
 
                     <CheckBox
                         android:id="@+id/checkBox4"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.9"
-                        android:text="F" />
+                        android:text="@string/friday" />
 
                     <CheckBox
                         android:id="@+id/checkBox2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1.09"
-                        android:text="SAT" />
+                        android:text="@string/saturday" />
+                </LinearLayout>
                 </LinearLayout>
             </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <LinearLayout
+            <TableRow>
+                <Space
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end|bottom"
-                        android:layout_margin="3dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_add_black" />
-                </LinearLayout>
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+                    android:layout_height="@dimen/schedule_padding"/>
             </TableRow>
         </TableLayout>
 
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/AddToScheduleFAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:src="@drawable/ic_add_black"
-        app:fabSize="normal"/>
 
     </LinearLayout>
