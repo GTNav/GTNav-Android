@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.spybug.gtnav.utils.DirectionsServerRequest;
 import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.interfaces.OnEventListener;
@@ -42,6 +43,11 @@ public class DirectionsMenuFragment extends Fragment {
     private ImageButton walkingButton, busesButton, bikingButton;
     private boolean directionsRequested = false;
     private View v;
+
+    private static final LatLngBounds GT_BOUNDS_PLACES = new LatLngBounds.Builder()
+            .include(new LatLng(33.75744, -84.418489))
+            .include(new LatLng(33.795217, -84.368278))
+            .build();
 
     private enum SelectedMode {
         WALKING("walking"),
@@ -230,7 +236,8 @@ public class DirectionsMenuFragment extends Fragment {
                             endLocation.getText().toString(),
                             curSelectedMode.toString(),
                             location,
-                            getString(R.string.mapbox_key));
+                            getString(R.string.mapbox_key),
+                            GT_BOUNDS_PLACES);
 
                     directionsRequested = true;
                 } catch (Exception e) {

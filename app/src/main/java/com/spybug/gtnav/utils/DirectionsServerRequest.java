@@ -8,6 +8,7 @@ import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.commons.utils.PolylineUtils;
 import com.spybug.gtnav.BuildConfig;
@@ -42,6 +43,7 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
     private boolean hasNetwork = true;
     private int errorCode = 0;
     private OnEventListener<List<LatLng>, String> mCallBack;
+    private final LatLng CENTER_CAMPUS = new LatLng(33.776714, -84.399065);
 
     private enum UserLocationUsage {START, END, NONE}
 
@@ -68,6 +70,8 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
         String mode = ((String) objects[2]).toLowerCase();
         Location user_location = (Location) objects[3];
         String mapboxApiKey = (String) objects[4];
+        LatLngBounds bounds = (LatLngBounds) objects[5];
+
 
         String inputLine;
         String stringUrl;
@@ -96,7 +100,6 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
             geo_client_start = new MapboxGeocoder.Builder()
                     .setAccessToken(mapboxApiKey)
                     .setLocation(start)
-                    .setProximity(-84.3963, 33.7756)
                     .build();
         }
 
@@ -104,7 +107,6 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
             geo_client_end = new MapboxGeocoder.Builder()
                     .setAccessToken(mapboxApiKey)
                     .setLocation(end)
-                    .setProximity(-84.3963, 33.7756)
                     .build();
         }
 
@@ -121,8 +123,8 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
                 geo_response_end = geo_client_end.execute();
             }
 
-            GeocoderFeature start_result = null;
-            GeocoderFeature end_result = null;
+            LatLng start_result = null;
+            LatLng end_result = null;
 
             if (geo_client_start != null) {
                 start_results = geo_response_start.body().getFeatures();
@@ -130,7 +132,14 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
                     errorCode = 2;
                     return points;
                 }
-                start_result = start_results.get(0);
+
+                start_result = getPointClosestCampus(start_results, bounds, user_location);
+
+                if (start_result == null) {
+                    errorCode = 2;
+                    return points;
+                }
+
             }
             if (geo_client_end != null) {
                 end_results = geo_response_end.body().getFeatures();
@@ -138,7 +147,12 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
                     errorCode = 2;
                     return points;
                 }
-                end_result = end_results.get(0);
+                end_result = getPointClosestCampus(end_results, bounds, user_location);
+
+                if (end_result == null) {
+                    errorCode = 2;
+                    return points;
+                }
             }
 
             String origin = null;
@@ -225,6 +239,35 @@ public class DirectionsServerRequest extends AsyncTask<Object, Void, List<LatLng
         }
 
         return points;
+    }
+
+    private LatLng getPointClosestCampus(List<GeocoderFeature> geocoderFeatures, LatLngBounds bounds,
+                                     Location user_location) {
+
+        List<LatLng> inBoundsPoints = new ArrayList<>();
+        for (GeocoderFeature point : geocoderFeatures) {
+            LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+            if (bounds.contains(latLng)) {
+                inBoundsPoints.add(latLng);
+            }
+        }
+
+        double minDistance = -1;
+        LatLng closePoint = CENTER_CAMPUS;
+        if (user_location != null) {
+            closePoint = new LatLng(user_location.getLatitude(), user_location.getLongitude());
+        }
+
+        LatLng result = null;
+        for (LatLng point : inBoundsPoints) {
+            double dist = closePoint.distanceTo(point);
+            if (minDistance == -1 || dist < minDistance) {
+                minDistance = dist;
+                result = point;
+            }
+        }
+
+        return result;
     }
 
     protected void onPostExecute(List<LatLng> result) {
