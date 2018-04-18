@@ -83,7 +83,7 @@ public class MapFragment extends SupportMapFragment {
 
         start_icon = iconFactory.fromBitmap(start_marker_icon);
         destination_icon = iconFactory.defaultMarker();
-        bikestation_icon = iconFactory.defaultMarker();
+        bikestation_icon = iconFactory.fromBitmap(drawableToBitmap(resources.getDrawable(R.drawable.bike_icon), 80, 80));
 
         busRoute = null;
         busesHM = new HashMap<>();

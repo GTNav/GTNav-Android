@@ -39,11 +39,14 @@ public final class HelperUtil {
 
     public static Bitmap drawableToBitmap (Drawable drawable, int width, int height) {
 
+        Bitmap bitmap;
+
         if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
+            bitmap = ((BitmapDrawable)drawable).getBitmap();
+            return Bitmap.createScaledBitmap(bitmap, width, height, true);
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
 
@@ -55,13 +58,16 @@ public final class HelperUtil {
 
     public static Bitmap drawableToBitmap (Drawable drawable, double scale) {
 
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
+        Bitmap bitmap;
         int scaledWidth = (int) (drawable.getIntrinsicWidth() * scale);
         int scaledHeight = (int) (drawable.getIntrinsicHeight() * scale);
-        Bitmap bitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
+
+        if (drawable instanceof BitmapDrawable) {
+            bitmap = ((BitmapDrawable)drawable).getBitmap();
+            return Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true);
+        }
+
+        bitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
 
