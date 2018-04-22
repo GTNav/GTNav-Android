@@ -83,7 +83,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO
-                Toast.makeText(ScheduleFragment.this.getContext(), "Event Selected", Toast.LENGTH_LONG).show();
+                Toast.makeText(ScheduleFragment.this.getContext(), "Event Selected", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -92,7 +92,7 @@ public class ScheduleFragment extends Fragment {
             public void onClick(View v) {
                 addEvent();
                 //eventList.add(addEvent());
-                Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_SHORT).show();
             }
         });
 

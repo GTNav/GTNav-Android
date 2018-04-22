@@ -1,14 +1,34 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.spybug.gtnav.fragments.ScheduleFragment">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:paddingTop="15dp"
+             android:paddingStart="15dp"
+             android:paddingEnd="15dp"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             tools:context="com.spybug.gtnav.fragments.ScheduleFragment">
 
-    <ListView
-        android:id="@+id/ScheduleListView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scheduled Events"
+            android:textColor="#1a1a1a"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="5dp"
+            android:ems="20"/>
+
+        <ListView
+            android:id="@+id/ScheduleListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/AddToScheduleFAB"

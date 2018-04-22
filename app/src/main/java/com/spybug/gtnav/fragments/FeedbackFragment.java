@@ -92,7 +92,7 @@ public class FeedbackFragment extends Fragment {
         fTypeSpinner = view.findViewById(R.id.feedbackType);
         fSubmitButton = view.findViewById(R.id.submitButton);
 
-        fTypeSpinner.setPrompt("Select one...");
+        fTypeSpinner.setPrompt("Select an issue:");
         fTypeSpinner.setAdapter(new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, typeList));
 
         fSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +106,7 @@ public class FeedbackFragment extends Fragment {
                 emailText.setText("");
                 detailsText.setText("");
                 fTypeSpinner.setSelection(0);
-                Toast.makeText(v.getContext(), "Feedback sent", Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), "Feedback sent!", Toast.LENGTH_LONG).show();
             }
         });
 

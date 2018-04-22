@@ -1,9 +1,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.spybug.gtnav.fragments.FeedbackFragment">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingEnd="20dp"
+              android:paddingStart="20dp"
+              android:paddingTop="25dp"
+              tools:context="com.spybug.gtnav.fragments.FeedbackFragment">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Feedback"
+        android:textColor="#1a1a1a"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:ems="20"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/feedback_padding"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,12 +30,12 @@
         android:id="@+id/emailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textEmailAddress" />
+        android:ems="11"
+        android:inputType="textEmailAddress"/>
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/feedback_padding" />
+        android:layout_height="@dimen/feedback_padding"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -28,12 +44,13 @@
 
     <Spinner
         android:id="@+id/feedbackType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="250dp"
+        android:spinnerMode="dialog"
+        android:layout_height="wrap_content"/>
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/feedback_padding" />
+        android:layout_height="@dimen/feedback_padding"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,16 +61,20 @@
         android:id="@+id/detailsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textMultiLine" />
+        android:ems="13"
+        android:gravity="start"
+        android:minLines="2"
+        android:maxLines="4"
+        android:inputType="textMultiLine"/>
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/feedback_padding" />
+        android:layout_height="60dp"/>
 
     <Button
         android:id="@+id/submitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/feedback_submit" />
+        android:layout_width="80dp"
+        android:layout_height="45dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="@string/feedback_submit"/>
 </LinearLayout>
