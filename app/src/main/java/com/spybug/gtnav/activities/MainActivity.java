@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -159,7 +160,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Fragment newFragment = null;
 
         if (id == R.id.nav_map) {
             openMainMapFragment();
@@ -177,26 +177,7 @@ public class MainActivity extends AppCompatActivity
             openFaqFragment();
         } else if (id == R.id.nav_feedback) {
             openFeedbackFragment();
-        } else {
-            newFragment = new ScheduleFragment();
         }
-
-//        try {
-//            if (currentState == State.MAIN) {
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//
-//                Fragment overlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-//                Fragment menuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
-//                fragmentTransaction.remove(overlayFragment);
-//                fragmentTransaction.remove(menuFragment);
-//                fragmentTransaction.add(R.id.menu_frame, newFragment).addToBackStack(null);
-//                fragmentTransaction.commit();
-//            }
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         closeDrawer();
         item.setChecked(true);
@@ -250,10 +231,6 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            if (prevOverlayFragment != null) {
-                transaction.remove(prevOverlayFragment);
-            }
 
             Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
             if (prevMenuFragment != null) {
@@ -265,7 +242,9 @@ public class MainActivity extends AppCompatActivity
                 transaction.remove(bottomBarFragment);
             }
 
-            transaction.replace(R.id.map_frame, new ScheduleFragment());
+            hideMap();
+
+            transaction.replace(R.id.map_overlay_frame, new ScheduleFragment());
             transaction.addToBackStack(ROOT_TAG);
             transaction.commit();
 
@@ -275,16 +254,13 @@ public class MainActivity extends AppCompatActivity
 
     public void openSettingsFragment() {
         //Temporarily don't open settings page since it messes up on phones
-        Toast.makeText(getBaseContext(), "This page will be implemented soon!", Toast.LENGTH_SHORT).show();
-        if (currentState == State.SETTINGS) {
+        //Toast.makeText(getBaseContext(), "This page will be implemented soon!", Toast.LENGTH_SHORT).show();
+
+        if (currentState != State.SETTINGS) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            if (prevOverlayFragment != null) {
-                transaction.remove(prevOverlayFragment);
-            }
 
             Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
             if (prevMenuFragment != null) {
@@ -296,7 +272,9 @@ public class MainActivity extends AppCompatActivity
                 transaction.remove(bottomBarFragment);
             }
 
-            transaction.replace(R.id.map_frame, new SettingsFragment());
+            hideMap();
+
+            transaction.replace(R.id.map_overlay_frame, new SettingsFragment());
             transaction.addToBackStack(ROOT_TAG);
             transaction.commit();
 
@@ -310,10 +288,6 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            if (prevOverlayFragment != null) {
-                transaction.remove(prevOverlayFragment);
-            }
 
             Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
             if (prevMenuFragment != null) {
@@ -325,7 +299,9 @@ public class MainActivity extends AppCompatActivity
                 transaction.remove(bottomBarFragment);
             }
 
-            transaction.replace(R.id.map_frame, new FaqFragment());
+            hideMap();
+
+            transaction.replace(R.id.map_overlay_frame, new FaqFragment());
             transaction.addToBackStack(ROOT_TAG);
             transaction.commit();
 
@@ -339,10 +315,6 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.popBackStack(ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment prevOverlayFragment = fragmentManager.findFragmentById(R.id.map_overlay_frame);
-            if (prevOverlayFragment != null) {
-                transaction.remove(prevOverlayFragment);
-            }
 
             Fragment prevMenuFragment = fragmentManager.findFragmentById(R.id.menu_frame);
             if (prevMenuFragment != null) {
@@ -354,7 +326,9 @@ public class MainActivity extends AppCompatActivity
                 transaction.remove(bottomBarFragment);
             }
 
-            transaction.replace(R.id.map_frame, new FeedbackFragment());
+            hideMap();
+
+            transaction.replace(R.id.map_overlay_frame, new FeedbackFragment());
             transaction.addToBackStack(ROOT_TAG);
             transaction.commit();
 
@@ -390,6 +364,8 @@ public class MainActivity extends AppCompatActivity
                 transaction.remove(prevMenuFragment);
             }
         }
+
+        showMap();
 
         transaction.addToBackStack(ROOT_TAG);
         transaction.commit();
@@ -447,6 +423,28 @@ public class MainActivity extends AppCompatActivity
         if (GT_BOUNDS.contains(new LatLng(location.getLatitude(), location.getLongitude()))) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(), location.getLongitude()), 16));
+        }
+    }
+
+    private void showMap() {
+        if (mapFragment != null) {
+            View mapView = mapFragment.getView();
+            if (mapView != null) {
+                if (mapView.getVisibility() != View.VISIBLE) {
+                    mapView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    private void hideMap() {
+        if (mapFragment != null) {
+            View mapView = mapFragment.getView();
+            if (mapView != null) {
+                if (mapView.getVisibility() != View.GONE) {
+                    mapView.setVisibility(View.GONE);
+                }
+            }
         }
     }
 

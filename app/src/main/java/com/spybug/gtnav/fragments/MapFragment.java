@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -59,6 +58,11 @@ public class MapFragment extends SupportMapFragment {
     private HashMap<Integer, Bus> busesHM;
     private HashMap<String, BusStop> busStopHM;
     private HashMap<String, BikeStation> bikeStationsHM;
+
+    private static final LatLngBounds GT_BOUNDS = new LatLngBounds.Builder()
+            .include(new LatLng(33.753312, -84.421579))
+            .include(new LatLng(33.797474, -84.372656))
+            .build();
 
     /**
      * Creates the fragment view hierarchy.
@@ -234,6 +238,8 @@ public class MapFragment extends SupportMapFragment {
                 bikeStationsHM.put(bikeStation.id, bikeStation);
             }
         }
+
+        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(GT_BOUNDS, -250));
     }
 
     public void updateBusStops(List<BusStop> busStopPredictions) {
@@ -293,7 +299,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onStart() {
         super.onStart();
-        map.onStart();
+        if (map != null) {
+            map.onStart();
+        }
     }
 
     /**
@@ -302,7 +310,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onResume() {
         super.onResume();
-        map.onResume();
+        if (map != null) {
+            map.onResume();
+        }
     }
 
     /**
@@ -311,7 +321,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onPause() {
         super.onPause();
-        map.onPause();
+        if (map != null) {
+            map.onPause();
+        }
     }
 
     /**
@@ -322,7 +334,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        map.onSaveInstanceState(outState);
+        if (map != null) {
+            map.onSaveInstanceState(outState);
+        }
     }
 
     /**
@@ -331,7 +345,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onStop() {
         super.onStop();
-        map.onStop();
+        if (map != null) {
+            map.onStop();
+        }
     }
 
     /**
@@ -340,7 +356,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        map.onLowMemory();
+        if (map != null) {
+            map.onLowMemory();
+        }
     }
 
     /**
@@ -349,7 +367,9 @@ public class MapFragment extends SupportMapFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        map.onDestroy();
+        if (map != null) {
+            map.onDestroy();
+        }
         mapReadyCallbackList.clear();
     }
 
