@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -391,12 +389,21 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationPlugin() {
+        boolean locPref = prefs.getBoolean("location_preference", true);
+
         // Check if permissions are enabled and if not request
-        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+        if (PermissionsManager.areLocationPermissionsGranted(this) && locPref) {
             // Create an instance of LOST location engine
             initializeLocationEngine();
 
-            locationPlugin = new LocationLayerPlugin(mapFragment.map, map, locationEngine);
+            if (locationPlugin == null) {
+                locationPlugin = new LocationLayerPlugin(mapFragment.map, map, locationEngine);
+            }
+            else {
+                locationEngine.activate();
+                locationEngine.requestLocationUpdates();
+                locationPlugin.onStart();
+            }
             locationPlugin.setLocationLayerEnabled(LocationLayerMode.COMPASS);
         } else {
             if (prefs.getBoolean("location_preference", true)) {
@@ -421,7 +428,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public Location getLastLocation() {
-        if (locationPlugin != null) {
+        if (locationPlugin != null && locationPlugin.getLocationLayerMode() != LocationLayerMode.NONE) {
             return locationPlugin.getLastKnownLocation();
         }
         return null;
@@ -454,6 +461,22 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    public void disableLocation() {
+        if (locationEngine != null) {
+            locationEngine.removeLocationUpdates();
+            locationEngine.deactivate();
+        }
+        if (locationPlugin != null) {
+            locationPlugin.setLocationLayerEnabled(LocationLayerMode.NONE);
+            locationPlugin.onStop();
+        }
+    }
+
+    public void enableLocation() {
+        enableLocationPlugin();
     }
 
     @Override

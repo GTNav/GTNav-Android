@@ -1,6 +1,7 @@
 package com.spybug.gtnav.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.activities.MainActivity;
 
 /**
  * A simple {@link PreferenceFragmentCompat} subclass.
@@ -18,7 +20,7 @@ import com.spybug.gtnav.R;
  * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private OnFragmentInteractionListener mListener;
 
@@ -52,6 +54,33 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.settings);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("location_preference")) {
+            MainActivity activity = (MainActivity) getActivity();
+            if (activity != null) {
+                boolean locPref = sharedPreferences.getBoolean("location_preference", false);
+                if (locPref) {
+                    activity.enableLocation();
+                }
+                else {
+                    activity.disableLocation();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this); //add listener
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this); //remove listener
+    }
 
     @Override
     public void onAttach(Context context) {
