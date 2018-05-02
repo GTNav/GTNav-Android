@@ -1,8 +1,10 @@
 package com.spybug.gtnav.activities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity
     private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
     private BottomNavbarFragment bottomBarFragment;
+    private SharedPreferences prefs;
+
     private enum State {
         MAIN,
         DIRECTIONS,
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         currentState = null;
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false); //set default prefs if not set before
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         navMenu = findViewById(R.id.nav_view);
         navMenu.setNavigationItemSelectedListener(this);
@@ -393,8 +399,10 @@ public class MainActivity extends AppCompatActivity
             locationPlugin = new LocationLayerPlugin(mapFragment.map, map, locationEngine);
             locationPlugin.setLocationLayerEnabled(LocationLayerMode.COMPASS);
         } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(this);
+            if (prefs.getBoolean("location_preference", true)) {
+                permissionsManager = new PermissionsManager(this);
+                permissionsManager.requestLocationPermissions(this);
+            }
         }
     }
 
@@ -463,10 +471,8 @@ public class MainActivity extends AppCompatActivity
     public void onPermissionResult(boolean granted) {
         if (granted) {
             enableLocationPlugin();
-        } else {
-            Toast.makeText(this, "You didn't grant location permissions.", Toast.LENGTH_LONG).show();
-            finish();
         }
+        prefs.edit().putBoolean("location_preference", granted).apply(); //Save result in preferences
     }
 
     @Override
