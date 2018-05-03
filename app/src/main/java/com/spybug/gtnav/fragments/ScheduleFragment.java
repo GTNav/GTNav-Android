@@ -14,11 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.models.AppDatabase;
 import com.spybug.gtnav.models.ScheduleEvent;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Random;
+import java.util.SimpleTimeZone;
 
 
 /**
@@ -41,6 +47,7 @@ public class ScheduleFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    ArrayAdapter<ScheduleEvent> listAdapter;
     private ListView scheduleView;
     private List<ScheduleEvent> eventList;
 
@@ -71,13 +78,15 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        eventList = testEvents(); //new ArrayList<>();
+        eventList = new ArrayList<>();
         scheduleView = v.findViewById(R.id.ScheduleListView);
         FloatingActionButton addFab = v.findViewById(R.id.AddToScheduleFAB);
 
-        ArrayAdapter<ScheduleEvent> listAdapter =
-                new ArrayAdapter<>(v.getContext(), android.R.layout.simple_list_item_1, eventList);
+        listAdapter = new ArrayAdapter<>(v.getContext(), android.R.layout.simple_list_item_1, eventList);
         scheduleView.setAdapter(listAdapter);
+
+        List<ScheduleEvent> events = AppDatabase.getAppDatabase(getContext()).scheduleEventDao().getAll();
+        eventList.addAll(events);
 
         scheduleView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,8 +99,11 @@ public class ScheduleFragment extends Fragment {
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addEvent();
-                //eventList.add(addEvent());
+                ScheduleEvent newEvent = addEvent();
+                eventList.add(newEvent);
+                AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insert(newEvent);
+
+                listAdapter.notifyDataSetChanged();
                 Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_SHORT).show();
             }
         });
@@ -99,23 +111,10 @@ public class ScheduleFragment extends Fragment {
         return v;
     }
 
-    //Testing the List View
-    private ArrayList<ScheduleEvent> testEvents() {
-        ArrayList<ScheduleEvent> events = new ArrayList<>();
-        String[] dow = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-
-        events.add(new ScheduleEvent("Event 1", "3:00pm", null, dow));
-        events.add(new ScheduleEvent("Event 2", "5:00pm", null, dow));
-        events.add(new ScheduleEvent("Event 3", "1:30am", null, dow));
-        events.add(new ScheduleEvent("Event 4", "2:22am", null, dow));
-
-        return events;
-    }
-
     private ScheduleEvent addEvent() {
         DialogFragment addEventFragment = new AddScheduleEventFragment();
         addEventFragment.show(getActivity().getSupportFragmentManager(), "AddScheduleEvent");
-        return null;
+        return new ScheduleEvent("test name " + Math.random(), Math.random(), "location name", new LatLng(), new GregorianCalendar());
     }
 
     // The dialog fragment receives a reference to this Activity through the
