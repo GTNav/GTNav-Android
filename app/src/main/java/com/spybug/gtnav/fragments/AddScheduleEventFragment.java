@@ -1,26 +1,24 @@
 package com.spybug.gtnav.fragments;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.models.ScheduleEvent;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -84,7 +82,7 @@ public class AddScheduleEventFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View v = inflater.inflate(R.layout.schedule_addevent_submenu, null);
+        final View v = inflater.inflate(R.layout.schedule_addevent_dialog, null);
         builder.setView(v)
                 .setCancelable(true)
                 .setPositiveButton(R.string.submit_creation, new DialogInterface.OnClickListener() {
@@ -124,12 +122,40 @@ public class AddScheduleEventFragment extends DialogFragment {
             }
         });
 
+        EditText startDateEdit = v.findViewById(R.id.start_date);
+        EditText endDateEdit = v.findViewById(R.id.end_date);
+        startDateEdit.setOnClickListener(dateEditClick);
+        endDateEdit.setOnClickListener(dateEditClick);
+
         // Create the AlertDialog object and return it
         return builder.create();
     }
 
+    private EditText.OnClickListener dateEditClick = new EditText.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            GregorianCalendar currentDate = (GregorianCalendar) GregorianCalendar.getInstance();
+
+            DatePickerDialog datePicker;
+            datePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                    //TODO: Update ScheduleEvent object with new date
+                    GregorianCalendar dateResult = (GregorianCalendar) GregorianCalendar.getInstance();
+                    dateResult.set(year, month, day);
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy", Locale.US);
+                    String dateString = dateFormat.format(dateResult.getTime());
+                    ((EditText) view).setText(dateString);
+                }
+            }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
+            datePicker.setTitle("Select Date");
+            datePicker.show();
+        }
+    };
+
     private String timeTo12HR(int hourOfDay, int minute) {
-        String am_pm = "";
+        String am_pm;
 
         Calendar datetime = Calendar.getInstance();
         datetime.set(Calendar.HOUR_OF_DAY, hourOfDay);

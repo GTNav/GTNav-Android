@@ -60,11 +60,11 @@
     <string name="thursday">Thu</string>
     <string name="friday">Fri</string>
     <string name="saturday">Sat</string>
-    <string name="submit_creation">OK</string>
+    <string name="submit_creation">Save</string>
     <string name="cancel_creation">Cancel</string>
-    <string name="select_start_date">Select start date</string>
-    <string name="select_event_time">Select event time</string>
-    <string name="select_end_date">Select end date</string>
+    <string name="select_start_date">Select Start Date</string>
+    <string name="select_event_time">Select Time</string>
+    <string name="select_end_date">Select End date</string>
 
     <string name="title_activity_maps">Map</string>
 

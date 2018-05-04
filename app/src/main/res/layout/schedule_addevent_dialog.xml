@@ -6,7 +6,9 @@
     android:orientation="vertical"
     android:layout_margin="5dp"
     android:paddingStart="5dp"
-    android:paddingEnd="5dp">
+    android:paddingEnd="5dp"
+    android:focusable="false"
+    android:focusableInTouchMode="true">
 
     <EditText
         android:id="@+id/name"
@@ -26,6 +28,7 @@
         android:layout_height="wrap_content"
         android:inputType="date"
         android:clickable="true"
+        android:longClickable="false"
         android:focusable="false"
         android:hint="@string/select_start_date"/>
 
@@ -36,6 +39,7 @@
         android:hint="@string/select_event_time"
         android:clickable="true"
         android:focusable="false"
+        android:longClickable="false"
         android:focusableInTouchMode="false"
         android:inputType="time"/>
 
@@ -140,12 +144,14 @@
     </LinearLayout>
 
     <EditText
+        android:id="@+id/end_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="date"
         android:clickable="true"
         android:focusable="false"
         android:visibility="visible"
+        android:longClickable="false"
         android:hint="@string/select_end_date"/>
 
 </LinearLayout>
