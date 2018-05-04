@@ -1,8 +1,10 @@
 package com.spybug.gtnav.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -10,10 +12,18 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TimePicker;
 
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.models.ScheduleEvent;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  *
@@ -27,6 +37,8 @@ public class AddScheduleEventFragment extends DialogFragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ScheduleEvent event;
 
     AddEventDialogListener mListener;
 
@@ -66,12 +78,15 @@ public class AddScheduleEventFragment extends DialogFragment {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.schedule_addevent_submenu, null))
+        final View v = inflater.inflate(R.layout.schedule_addevent_submenu, null);
+        builder.setView(v)
+                .setCancelable(true)
                 .setPositiveButton(R.string.submit_creation, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
@@ -80,23 +95,53 @@ public class AddScheduleEventFragment extends DialogFragment {
                 .setNegativeButton(R.string.cancel_creation, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
+                        dialog.dismiss();
                     }
                 });
+
+        final EditText timeEdit = v.findViewById(R.id.time);
+        timeEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GregorianCalendar currentTime = (GregorianCalendar) GregorianCalendar.getInstance();
+
+                //TODO: get time from stored ScheduleEvent value if there, otherwise use current
+                final int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = currentTime.get(Calendar.MINUTE);
+
+                TimePickerDialog timePicker;
+                timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                        //TODO: Update ScheduleEvent object with new time
+
+                        String timeString = timeTo12HR(hourOfDay, minute);
+                        timeEdit.setText(timeString);
+                    }
+                }, hour, minute, false);
+                timePicker.setTitle("Select time");
+                timePicker.show();
+            }
+        });
+
         // Create the AlertDialog object and return it
         return builder.create();
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Verify that the host activity implements the callback interface
-//        try {
-//            // Instantiate the NoticeDialogListener so we can send events to the host
-//            mListener = (AddEventDialogListener) activity;
-//        } catch (ClassCastException e) {
-//            // The activity doesn't implement the interface, throw exception
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement NoticeDialogListener");
-//        }
+    private String timeTo12HR(int hourOfDay, int minute) {
+        String am_pm = "";
+
+        Calendar datetime = Calendar.getInstance();
+        datetime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        datetime.set(Calendar.MINUTE, minute);
+
+        if (datetime.get(Calendar.AM_PM) == Calendar.AM)
+            am_pm = "AM";
+        else
+            am_pm = "PM";
+
+        String strHrsToShow = (datetime.get(Calendar.HOUR) == 0) ? "12" : datetime.get(Calendar.HOUR)+"";
+        return strHrsToShow + ":" + datetime.get(Calendar.MINUTE) + " " + am_pm;
     }
 }
+

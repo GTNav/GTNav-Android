@@ -113,6 +113,7 @@ public class ScheduleFragment extends Fragment {
 
     private ScheduleEvent addEvent() {
         DialogFragment addEventFragment = new AddScheduleEventFragment();
+        addEventFragment.setTargetFragment(this, 1);
         addEventFragment.show(getActivity().getSupportFragmentManager(), "AddScheduleEvent");
         return new ScheduleEvent("test name " + Math.random(), Math.random(), "location name", new LatLng(), new GregorianCalendar());
     }

@@ -1,122 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="5dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_prompt" />
+
+    <EditText
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/location_prompt" />
+
+    <EditText
+        android:id="@+id/start_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="@string/select_start_date"/>
+
+    <EditText
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_event_time"
+        android:clickable="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="time"/>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:orientation="vertical">
 
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:text="@string/repeat_prompt"/>
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+        <LinearLayout
+            android:id="@+id/checkboxes_linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/name_prompt" />
-            </TableRow>
+            <CheckedTextView
+                android:id="@+id/checkBox0"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/sunday" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+            <CheckedTextView
+                android:id="@+id/checkBox1"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/monday" />
 
-                <EditText
-                    android:id="@+id/location"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/location_prompt" />
-            </TableRow>
+            <CheckedTextView
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/tuesday" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+            <CheckedTextView
+                android:id="@+id/checkBox3"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/wednesday" />
 
-                <TimePicker
-                    android:id="@+id/simpleTimePicker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="360dp"
-                    android:timePickerMode="clock" />
-            </TableRow>
+            <CheckedTextView
+                android:id="@+id/checkBox4"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/thursday" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+            <CheckedTextView
+                android:id="@+id/checkBox5"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:text="@string/friday" />
 
-                <LinearLayout
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/repeat_prompt"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/checkBox7"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.14"
-                        android:text="@string/sunday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox8"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:text="@string/monday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox5"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:text="@string/tuesday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox6"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:text="@string/wednesday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox3"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:text="@string/thursday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox4"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:text="@string/friday" />
-
-                    <CheckBox
-                        android:id="@+id/checkBox2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.09"
-                        android:text="@string/saturday" />
-                </LinearLayout>
-                </LinearLayout>
-            </TableRow>
-            <TableRow>
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/schedule_padding"/>
-            </TableRow>
-        </TableLayout>
-
-
+            <CheckedTextView
+                android:id="@+id/checkBox6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingEnd="@dimen/repeat_checkbox_padding"
+                android:paddingStart="@dimen/repeat_checkbox_padding"
+                android:text="@string/saturday"
+                android:textAlignment="center"/>
+        </LinearLayout>
     </LinearLayout>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:clickable="true"
+        android:focusable="false"
+        android:visibility="visible"
+        android:hint="@string/select_end_date"/>
+
+</LinearLayout>
