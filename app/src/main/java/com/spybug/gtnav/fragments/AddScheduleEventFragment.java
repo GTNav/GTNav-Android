@@ -10,14 +10,15 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TimePicker;
 
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.models.ScheduleEvent;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -37,16 +38,19 @@ public class AddScheduleEventFragment extends DialogFragment {
     private String mParam2;
 
     private ScheduleEvent event;
+    private boolean[] repeatDayIndex; //0 = Sun, 1 = Mon, etc...
+    private EditText endDateEditText;
 
     AddEventDialogListener mListener;
 
     public AddScheduleEventFragment() {
         // Required empty public constructor
+        event = new ScheduleEvent(System.currentTimeMillis());
+        repeatDayIndex = new boolean[7];
     }
 
     public interface AddEventDialogListener {
-        void onDialogPositiveClick(DialogFragment dialog);
-        void onDialogNegativeClick(DialogFragment dialog);
+        void onDialogPositiveClick(ScheduleEvent event);
     }
 
     /**
@@ -82,36 +86,63 @@ public class AddScheduleEventFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
+
         final View v = inflater.inflate(R.layout.schedule_addevent_dialog, null);
-        builder.setView(v)
-                .setCancelable(true)
-                .setPositiveButton(R.string.submit_creation, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // FIRE ZE MISSILES!
-                    }
-                })
-                .setNegativeButton(R.string.cancel_creation, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                        dialog.dismiss();
-                    }
-                });
+
+
+        final EditText nameEdit = v.findViewById(R.id.name);
+        nameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    EditText nameEdit = (EditText) view;
+                    event.setEventName(nameEdit.getText().toString());
+                }
+            }
+        });
+
+        final EditText locationEdit = v.findViewById(R.id.location);
+        locationEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    EditText locationEdit = (EditText) view;
+                    event.setLocationName(locationEdit.getText().toString());
+                }
+            }
+        });
 
         final EditText timeEdit = v.findViewById(R.id.time);
         timeEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GregorianCalendar currentTime = (GregorianCalendar) GregorianCalendar.getInstance();
+                int hour;
+                int minute;
 
-                //TODO: get time from stored ScheduleEvent value if there, otherwise use current
-                final int hour = currentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = currentTime.get(Calendar.MINUTE);
+                //Get time from stored ScheduleEvent value if there, otherwise use current
+                GregorianCalendar timestamp = event.getTime();
+                if (timestamp == null) {
+                    GregorianCalendar currentTime = (GregorianCalendar) GregorianCalendar.getInstance();
+                    hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                    minute = currentTime.get(Calendar.MINUTE);
+                    event.setTime(currentTime);
+                }
+                else {
+                    hour =  timestamp.get(Calendar.HOUR_OF_DAY);
+                    minute = timestamp.get(Calendar.MINUTE);
+                }
 
                 TimePickerDialog timePicker;
                 timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                        //TODO: Update ScheduleEvent object with new time
+                        GregorianCalendar timestamp = event.getTime();
+                        if (timestamp == null) {
+                            timestamp = (GregorianCalendar) GregorianCalendar.getInstance();
+                        }
+                        timestamp.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        timestamp.set(Calendar.MINUTE, minute);
+                        event.setTime(timestamp);
 
                         String timeString = timeTo12HR(hourOfDay, minute);
                         timeEdit.setText(timeString);
@@ -123,13 +154,104 @@ public class AddScheduleEventFragment extends DialogFragment {
         });
 
         EditText startDateEdit = v.findViewById(R.id.start_date);
-        EditText endDateEdit = v.findViewById(R.id.end_date);
+        endDateEditText = v.findViewById(R.id.end_date);
         startDateEdit.setOnClickListener(dateEditClick);
-        endDateEdit.setOnClickListener(dateEditClick);
+        endDateEditText.setOnClickListener(dateEditClick);
+
+        LinearLayout checkboxLinearLayout = v.findViewById(R.id.checkboxes_linearlayout);
+        for (int i = 0; i < checkboxLinearLayout.getChildCount(); i++) {
+            View child = checkboxLinearLayout.getChildAt(i);
+            child.setOnClickListener(checkBoxClick);
+        }
+
+        builder.setView(v)
+                .setCancelable(true)
+                .setPositiveButton(R.string.submit_creation, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        AddEventDialogListener listener = (AddEventDialogListener) getTargetFragment();
+                        if (listener != null) {
+                            validateResponses(v);
+
+                            listener.onDialogPositiveClick(event);
+                        }
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancel_creation, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss(); //do nothing when hit cancel, throw away changes
+                    }
+                });
 
         // Create the AlertDialog object and return it
         return builder.create();
     }
+
+    private boolean validateResponses(View v) {
+        EditText locationEdit = v.findViewById(R.id.location);
+        EditText nameEdit = v.findViewById(R.id.name);
+
+        String locationEditText = locationEdit.getText().toString();
+        event.setLocationName(locationEditText);
+
+        String eventNameText = nameEdit.getText().toString();
+        event.setEventName(eventNameText);
+
+        return true;
+    }
+
+    private CheckedTextView.OnClickListener checkBoxClick = new CheckedTextView.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            CheckedTextView checkbox = (CheckedTextView) view;
+            checkbox.toggle();
+
+            int index;
+            switch (view.getId()) {
+                case R.id.sunday_checkbox:
+                    index = 0;
+                    break;
+                case R.id.monday_checkbox:
+                    index = 1;
+                    break;
+                case R.id.tuesday_checkbox:
+                    index = 2;
+                    break;
+                case R.id.wednesday_checkbox:
+                    index = 3;
+                    break;
+                case R.id.thursday_checkbox:
+                    index = 4;
+                    break;
+                case R.id.friday_checkbox:
+                    index = 5;
+                    break;
+                case R.id.saturday_checkbox:
+                    index = 6;
+                    break;
+                default:
+                    return;
+            }
+
+            repeatDayIndex[index] = checkbox.isChecked();
+
+            EditText end_date = endDateEditText;
+            boolean allUnchecked = true;
+            for (boolean checked : repeatDayIndex) {
+                if (checked) {
+                    if (end_date.getVisibility() == View.INVISIBLE) {
+                        end_date.setVisibility(View.VISIBLE);
+                    }
+                    allUnchecked = false;
+                }
+            }
+
+            if (allUnchecked && end_date.getVisibility() == View.VISIBLE) {
+                end_date.setVisibility(View.INVISIBLE);
+            }
+
+        }
+    };
 
     private EditText.OnClickListener dateEditClick = new EditText.OnClickListener() {
         @Override
@@ -167,7 +289,8 @@ public class AddScheduleEventFragment extends DialogFragment {
             am_pm = "PM";
 
         String strHrsToShow = (datetime.get(Calendar.HOUR) == 0) ? "12" : datetime.get(Calendar.HOUR)+"";
-        return strHrsToShow + ":" + datetime.get(Calendar.MINUTE) + " " + am_pm;
+        String strMinsToShow = (datetime.get(Calendar.MINUTE) < 10) ? "0" + datetime.get(Calendar.MINUTE) : datetime.get(Calendar.MINUTE)+"";
+        return strHrsToShow + ":" + strMinsToShow + " " + am_pm;
     }
 }
 

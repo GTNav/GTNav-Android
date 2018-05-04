@@ -2,6 +2,7 @@ package com.spybug.gtnav.models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
@@ -18,7 +19,7 @@ public class ScheduleEvent {
     private int id;
 
     @ColumnInfo(name = "group_id")
-    private double groupId; //Unique groupId for same reoccurring events
+    private long groupId; //Unique groupId for same reoccurring events
 
     @ColumnInfo(name = "loc_name")
     private String locationName;
@@ -36,7 +37,16 @@ public class ScheduleEvent {
 
     public ScheduleEvent() {}
 
-    public ScheduleEvent(String eventName, double groupId, String locName, LatLng loc, GregorianCalendar time) {
+    @Ignore
+    public ScheduleEvent(long groupId) {
+        this.groupId = groupId; //Empty new schedule event
+        this.time = (GregorianCalendar) GregorianCalendar.getInstance();
+        this.location = new LatLng();
+        this.eventName = "";
+        this.locationName = "";
+    }
+
+    public ScheduleEvent(String eventName, long groupId, String locName, LatLng loc, GregorianCalendar time) {
         this.eventName = eventName;
         this.locationName = locName;
         this.time = time;
@@ -46,14 +56,18 @@ public class ScheduleEvent {
 
     @Override
     public String toString() {
-        return eventName + " " + groupId + " " + locationName;
+        return "event: " + eventName +
+                "\nloc: " + locationName +
+                "\ngroup: " + groupId +
+                "\ncoord: " + location.getLatitude() + "," + location.getLongitude() +
+                "\ntime: " + time.getTime().toString();
     }
 
     public int getId() {
         return id;
     }
 
-    public double getGroupId() {
+    public long getGroupId() {
         return groupId;
     }
 
@@ -73,7 +87,7 @@ public class ScheduleEvent {
         return locationName;
     }
 
-    public void setGroupId(double groupId) {
+    public void setGroupId(long groupId) {
         this.groupId = groupId;
     }
 

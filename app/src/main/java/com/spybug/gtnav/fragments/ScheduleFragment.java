@@ -14,17 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.spybug.gtnav.R;
+import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.models.AppDatabase;
 import com.spybug.gtnav.models.ScheduleEvent;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Random;
-import java.util.SimpleTimeZone;
 
 
 /**
@@ -35,7 +31,7 @@ import java.util.SimpleTimeZone;
  * Use the {@link ScheduleFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ScheduleFragment extends Fragment {
+public class ScheduleFragment extends Fragment implements AddScheduleEventFragment.AddEventDialogListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -91,7 +87,7 @@ public class ScheduleFragment extends Fragment {
         scheduleView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO
+                //TODO edit the schedule event
                 Toast.makeText(ScheduleFragment.this.getContext(), "Event Selected", Toast.LENGTH_SHORT).show();
             }
         });
@@ -99,34 +95,28 @@ public class ScheduleFragment extends Fragment {
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ScheduleEvent newEvent = addEvent();
-                eventList.add(newEvent);
-                AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insert(newEvent);
-
-                listAdapter.notifyDataSetChanged();
-                Toast.makeText(v.getContext(), "Event Added", Toast.LENGTH_SHORT).show();
+                openDialog();
             }
         });
 
         return v;
     }
 
-    private ScheduleEvent addEvent() {
+    private void openDialog() {
         DialogFragment addEventFragment = new AddScheduleEventFragment();
         addEventFragment.setTargetFragment(this, 1);
-        addEventFragment.show(getActivity().getSupportFragmentManager(), "AddScheduleEvent");
-        return new ScheduleEvent("test name " + Math.random(), Math.random(), "location name", new LatLng(), new GregorianCalendar());
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) {
+            addEventFragment.show(activity.getSupportFragmentManager(), "AddScheduleEvent");
+        }
     }
 
-    // The dialog fragment receives a reference to this Activity through the
-    // Fragment.onAttach() callback, which it uses to call the following methods
-    // defined by the NoticeDialogFragment.NoticeDialogListener interface
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        Toast.makeText(getContext(), "Sure thing my dude", Toast.LENGTH_LONG).show();
-    }
-
-    public void onDialogNegativeClick(DialogFragment dialog) {
-        // User touched the dialog's negative button
+    // The dialog fragment sends back its finished object
+    public void onDialogPositiveClick(ScheduleEvent event) {
+        Toast.makeText(getContext(), "Saved new event to db", Toast.LENGTH_LONG).show();
+        eventList.add(event);
+        AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insert(event);
+        listAdapter.notifyDataSetChanged();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

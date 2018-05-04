@@ -65,7 +65,8 @@
             android:orientation="horizontal">
 
             <CheckedTextView
-                android:id="@+id/checkBox0"
+                android:id="@+id/sunday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:textAlignment="center"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -76,7 +77,8 @@
                 android:text="@string/sunday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox1"
+                android:id="@+id/monday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -87,7 +89,8 @@
                 android:text="@string/monday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox2"
+                android:id="@+id/tuesday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -98,7 +101,8 @@
                 android:text="@string/tuesday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox3"
+                android:id="@+id/wednesday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -109,7 +113,8 @@
                 android:text="@string/wednesday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox4"
+                android:id="@+id/thursday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -120,7 +125,8 @@
                 android:text="@string/thursday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox5"
+                android:id="@+id/friday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -131,7 +137,8 @@
                 android:text="@string/friday" />
 
             <CheckedTextView
-                android:id="@+id/checkBox6"
+                android:id="@+id/saturday_checkbox"
+                android:drawableTop="@drawable/checkmark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -150,7 +157,7 @@
         android:inputType="date"
         android:clickable="true"
         android:focusable="false"
-        android:visibility="visible"
+        android:visibility="invisible"
         android:longClickable="false"
         android:hint="@string/select_end_date"/>
 
