@@ -8,20 +8,25 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.models.ScheduleEvent;
+import com.spybug.gtnav.utils.TextValidator;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -39,7 +44,12 @@ public class AddScheduleEventFragment extends DialogFragment {
 
     private ScheduleEvent event;
     private boolean[] repeatDayIndex; //0 = Sun, 1 = Mon, etc...
+    private EditText nameEditText;
+    private EditText locationEditText;
+    private EditText timeEditText;
+    private EditText startDateEditText;
     private EditText endDateEditText;
+    private List<TextView> requiredTexts;
 
     AddEventDialogListener mListener;
 
@@ -47,6 +57,7 @@ public class AddScheduleEventFragment extends DialogFragment {
         // Required empty public constructor
         event = new ScheduleEvent(System.currentTimeMillis());
         repeatDayIndex = new boolean[7];
+        requiredTexts = new ArrayList<>();
     }
 
     public interface AddEventDialogListener {
@@ -90,34 +101,42 @@ public class AddScheduleEventFragment extends DialogFragment {
         final View v = inflater.inflate(R.layout.schedule_addevent_dialog, null);
 
 
-        final EditText nameEdit = v.findViewById(R.id.name);
-        nameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        nameEditText = v.findViewById(R.id.event_name);
+        nameEditText.addTextChangedListener(new TextValidator(nameEditText) {
             @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    EditText nameEdit = (EditText) view;
-                    event.setEventName(nameEdit.getText().toString());
+            public void validate(TextView textView, String text) {
+                if (TextUtils.isEmpty(text)) {
+                    textView.setError("Event name required");
                 }
+                else {
+                    event.setEventName(text);
+                }
+                validateResponses();
             }
         });
 
-        final EditText locationEdit = v.findViewById(R.id.location);
-        locationEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        locationEditText = v.findViewById(R.id.location);
+        locationEditText.addTextChangedListener(new TextValidator(locationEditText) {
             @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    EditText locationEdit = (EditText) view;
-                    event.setLocationName(locationEdit.getText().toString());
+            public void validate(TextView textView, String text) {
+                if (TextUtils.isEmpty(text)) {
+                    textView.setError("Location required");
                 }
+                else {
+                    event.setLocationName(text);
+                }
+                validateResponses();
             }
         });
 
-        final EditText timeEdit = v.findViewById(R.id.time);
-        timeEdit.setOnClickListener(new View.OnClickListener() {
+        timeEditText = v.findViewById(R.id.time);
+        timeEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int hour;
                 int minute;
+
+                final EditText timeEdit = (EditText) view;
 
                 //Get time from stored ScheduleEvent value if there, otherwise use current
                 GregorianCalendar timestamp = event.getTime();
@@ -146,6 +165,7 @@ public class AddScheduleEventFragment extends DialogFragment {
 
                         String timeString = timeTo12HR(hourOfDay, minute);
                         timeEdit.setText(timeString);
+                        validateResponses();
                     }
                 }, hour, minute, false);
                 timePicker.setTitle("Select time");
@@ -153,9 +173,9 @@ public class AddScheduleEventFragment extends DialogFragment {
             }
         });
 
-        EditText startDateEdit = v.findViewById(R.id.start_date);
+        startDateEditText = v.findViewById(R.id.start_date);
         endDateEditText = v.findViewById(R.id.end_date);
-        startDateEdit.setOnClickListener(dateEditClick);
+        startDateEditText.setOnClickListener(dateEditClick);
         endDateEditText.setOnClickListener(dateEditClick);
 
         LinearLayout checkboxLinearLayout = v.findViewById(R.id.checkboxes_linearlayout);
@@ -170,7 +190,7 @@ public class AddScheduleEventFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         AddEventDialogListener listener = (AddEventDialogListener) getTargetFragment();
                         if (listener != null) {
-                            validateResponses(v);
+                            validateResponses();
 
                             listener.onDialogPositiveClick(event);
                         }
@@ -183,21 +203,40 @@ public class AddScheduleEventFragment extends DialogFragment {
                     }
                 });
 
+        //Add texts to validate before submission
+        requiredTexts.add(nameEditText);
+        requiredTexts.add(timeEditText);
+        requiredTexts.add(startDateEditText);
+        requiredTexts.add(locationEditText);
+
         // Create the AlertDialog object and return it
-        return builder.create();
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false); //disabled by default
+            }
+        });
+        return dialog;
     }
 
-    private boolean validateResponses(View v) {
-        EditText locationEdit = v.findViewById(R.id.location);
-        EditText nameEdit = v.findViewById(R.id.name);
+    private void validateResponses() {
 
-        String locationEditText = locationEdit.getText().toString();
-        event.setLocationName(locationEditText);
+        boolean foundError = false;
+        for (TextView text : requiredTexts) {
+            if (text.getError() != null || !TextUtils.isEmpty(text.getError()) ||
+                    TextUtils.isEmpty(text.getText().toString())) {
+                foundError = true;
+                break;
+            }
+        }
 
-        String eventNameText = nameEdit.getText().toString();
-        event.setEventName(eventNameText);
+        if (endDateEditText.getVisibility() == View.VISIBLE &&
+                TextUtils.isEmpty(endDateEditText.getText().toString())) {
+            foundError = true;
+        }
 
-        return true;
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(!foundError);
     }
 
     private CheckedTextView.OnClickListener checkBoxClick = new CheckedTextView.OnClickListener() {
@@ -241,6 +280,7 @@ public class AddScheduleEventFragment extends DialogFragment {
                 if (checked) {
                     if (end_date.getVisibility() == View.INVISIBLE) {
                         end_date.setVisibility(View.VISIBLE);
+                        validateResponses();
                     }
                     allUnchecked = false;
                 }
@@ -248,8 +288,8 @@ public class AddScheduleEventFragment extends DialogFragment {
 
             if (allUnchecked && end_date.getVisibility() == View.VISIBLE) {
                 end_date.setVisibility(View.INVISIBLE);
+                validateResponses();
             }
-
         }
     };
 
@@ -269,6 +309,7 @@ public class AddScheduleEventFragment extends DialogFragment {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy", Locale.US);
                     String dateString = dateFormat.format(dateResult.getTime());
                     ((EditText) view).setText(dateString);
+                    validateResponses();
                 }
             }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
             datePicker.setTitle("Select Date");

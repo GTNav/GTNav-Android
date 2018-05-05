@@ -11,15 +11,21 @@
     android:focusableInTouchMode="true">
 
     <EditText
-        android:id="@+id/name"
+        android:id="@+id/event_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:lines="1"
+        android:ems="14"
+        android:inputType="textCapSentences"
         android:hint="@string/name_prompt" />
 
     <EditText
         android:id="@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:lines="1"
+        android:ems="14"
+        android:inputType="textCapWords"
         android:hint="@string/location_prompt" />
 
     <EditText
@@ -27,9 +33,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="date"
+        android:ems="8"
         android:clickable="true"
         android:longClickable="false"
         android:focusable="false"
+        android:lines="1"
         android:hint="@string/select_start_date"/>
 
     <EditText
@@ -38,7 +46,9 @@
         android:layout_height="wrap_content"
         android:hint="@string/select_event_time"
         android:clickable="true"
+        android:ems="8"
         android:focusable="false"
+        android:lines="1"
         android:longClickable="false"
         android:focusableInTouchMode="false"
         android:inputType="time"/>
@@ -54,6 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:textAlignment="center"
+            android:lines="1"
             android:text="@string/repeat_prompt"/>
 
         <LinearLayout
@@ -156,6 +167,8 @@
         android:layout_height="wrap_content"
         android:inputType="date"
         android:clickable="true"
+        android:ems="8"
+        android:lines="1"
         android:focusable="false"
         android:visibility="invisible"
         android:longClickable="false"
