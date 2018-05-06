@@ -21,4 +21,10 @@ public abstract class ScheduleEventDao implements BaseDao<ScheduleEvent> {
      */
     @Query("DELETE FROM SCHEDULE_EVENT")
     public abstract void deleteAll();
+
+    /**
+     * Delete events of same repeated event groupId
+     */
+    @Query("DELETE FROM SCHEDULE_EVENT WHERE group_id = :groupId")
+    public abstract void deleteEventGroup(int groupId);
 }

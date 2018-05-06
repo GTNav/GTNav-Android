@@ -23,7 +23,7 @@ public interface BaseDao<T> {
      *
      * @param obj the objects to be inserted.
      */
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(T... obj);
 
     /**

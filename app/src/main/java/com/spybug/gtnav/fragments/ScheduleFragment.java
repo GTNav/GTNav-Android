@@ -114,10 +114,10 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
     }
 
     // The dialog fragment sends back its finished object
-    public void onDialogPositiveClick(ScheduleEvent event) {
-        Toast.makeText(getContext(), "Saved new event to db", Toast.LENGTH_LONG).show();
-        eventList.add(event);
-        AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insert(event);
+    public void onDialogPositiveClick(List<ScheduleEvent> events) {
+        Toast.makeText(getContext(), "Saved " + events.size() + " new events to db", Toast.LENGTH_LONG).show();
+        eventList.addAll(events);
+        AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insertAll(events);
         listAdapter.notifyDataSetChanged();
     }
 

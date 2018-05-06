@@ -13,7 +13,7 @@ import com.spybug.gtnav.utils.LatLngConverter;
 import java.util.GregorianCalendar;
 
 @Entity(tableName = "schedule_event")
-public class ScheduleEvent {
+public class ScheduleEvent implements Cloneable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -61,6 +61,17 @@ public class ScheduleEvent {
                 "\ngroup: " + groupId +
                 "\ncoord: " + location.getLatitude() + "," + location.getLongitude() +
                 "\ntime: " + time.getTime().toString();
+    }
+
+    public Object clone() {
+        try {
+            ScheduleEvent cloned = (ScheduleEvent) super.clone();
+            cloned.setTime((GregorianCalendar) cloned.getTime().clone());
+            return cloned;
+        }
+        catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 
     public int getId() {

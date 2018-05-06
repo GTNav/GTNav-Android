@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.models.ScheduleEvent;
@@ -28,6 +29,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -51,6 +53,10 @@ public class AddScheduleEventFragment extends DialogFragment {
     private EditText endDateEditText;
     private List<TextView> requiredTexts;
 
+    private static final long MAX_WEEKS_BETWEEN = 24; //Max 24 week between start and end date
+
+    private GregorianCalendar endDate;
+
     AddEventDialogListener mListener;
 
     public AddScheduleEventFragment() {
@@ -58,10 +64,11 @@ public class AddScheduleEventFragment extends DialogFragment {
         event = new ScheduleEvent(System.currentTimeMillis());
         repeatDayIndex = new boolean[7];
         requiredTexts = new ArrayList<>();
+        endDate = null;
     }
 
     public interface AddEventDialogListener {
-        void onDialogPositiveClick(ScheduleEvent event);
+        void onDialogPositiveClick(List<ScheduleEvent> events);
     }
 
     /**
@@ -130,48 +137,7 @@ public class AddScheduleEventFragment extends DialogFragment {
         });
 
         timeEditText = v.findViewById(R.id.time);
-        timeEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int hour;
-                int minute;
-
-                final EditText timeEdit = (EditText) view;
-
-                //Get time from stored ScheduleEvent value if there, otherwise use current
-                GregorianCalendar timestamp = event.getTime();
-                if (timestamp == null) {
-                    GregorianCalendar currentTime = (GregorianCalendar) GregorianCalendar.getInstance();
-                    hour = currentTime.get(Calendar.HOUR_OF_DAY);
-                    minute = currentTime.get(Calendar.MINUTE);
-                    event.setTime(currentTime);
-                }
-                else {
-                    hour =  timestamp.get(Calendar.HOUR_OF_DAY);
-                    minute = timestamp.get(Calendar.MINUTE);
-                }
-
-                TimePickerDialog timePicker;
-                timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                        GregorianCalendar timestamp = event.getTime();
-                        if (timestamp == null) {
-                            timestamp = (GregorianCalendar) GregorianCalendar.getInstance();
-                        }
-                        timestamp.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        timestamp.set(Calendar.MINUTE, minute);
-                        event.setTime(timestamp);
-
-                        String timeString = timeTo12HR(hourOfDay, minute);
-                        timeEdit.setText(timeString);
-                        validateResponses();
-                    }
-                }, hour, minute, false);
-                timePicker.setTitle("Select time");
-                timePicker.show();
-            }
-        });
+        timeEditText.setOnClickListener(timeEditClick);
 
         startDateEditText = v.findViewById(R.id.start_date);
         endDateEditText = v.findViewById(R.id.end_date);
@@ -192,9 +158,23 @@ public class AddScheduleEventFragment extends DialogFragment {
                         if (listener != null) {
                             validateResponses();
 
-                            listener.onDialogPositiveClick(event);
+                            if (endDateEditText.getVisibility() == View.INVISIBLE) {
+                                endDate = null;
+                            }
+                            else {
+                                long dateDiffMs = endDate.getTimeInMillis() - event.getTime().getTimeInMillis();
+                                long daysDiff = TimeUnit.MILLISECONDS.toDays(dateDiffMs);
+                                if ((daysDiff / 7.0) > MAX_WEEKS_BETWEEN) {
+                                    Toast.makeText(getContext(), "Time between dates is too large, please choose a closer end date", Toast.LENGTH_LONG).show();
+                                    return; //Exit without saving
+                                }
+                            }
+
+                            List<ScheduleEvent> events = createRepeatableEvents(event, endDate, repeatDayIndex);
+                            listener.onDialogPositiveClick(events); //Send back events to listener
+
                         }
-                        dialog.dismiss();
+                        dialog.dismiss(); //Closes the dialog
                     }
                 })
                 .setNegativeButton(R.string.cancel_creation, new DialogInterface.OnClickListener() {
@@ -220,6 +200,7 @@ public class AddScheduleEventFragment extends DialogFragment {
         return dialog;
     }
 
+    //Used after user changes fields to allow saving of event if valid entries
     private void validateResponses() {
 
         boolean foundError = false;
@@ -237,6 +218,51 @@ public class AddScheduleEventFragment extends DialogFragment {
         }
 
         ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(!foundError);
+    }
+
+    private List<ScheduleEvent> createRepeatableEvents(ScheduleEvent startEvent, GregorianCalendar endDate, boolean[] repeatDayIndex) {
+        List<ScheduleEvent> repeatedEvents = new ArrayList<>();
+        repeatedEvents.add(startEvent);
+
+        List<Integer> repeatDaysOfWeekIndex = new ArrayList<>();
+        for (int i = 0; i < repeatDayIndex.length; i++) {
+            boolean val = repeatDayIndex[i];
+            if (val) {
+                repeatDaysOfWeekIndex.add(i + 1); // 1 = Sunday, 7 = Saturday
+            }
+        }
+
+        if (repeatDaysOfWeekIndex.size() == 0 || endDate == null) {
+            return repeatedEvents; // No repeat days so return one
+        }
+
+        GregorianCalendar startDate = startEvent.getTime(); //Start of repeated date for repeating days
+        GregorianCalendar newStartOfWeekDate = ((GregorianCalendar) startDate.clone()); //First day of week for in between start/end date
+        newStartOfWeekDate.set(Calendar.DAY_OF_WEEK, newStartOfWeekDate.getFirstDayOfWeek());
+
+        //while the newStartOfWeekDate is before the endDate
+        while (newStartOfWeekDate.compareTo(endDate) <= 0) {
+            //Create date for every weekday that should be repeated
+            for (Integer dayOfWeek : repeatDaysOfWeekIndex) {
+                GregorianCalendar newDate = (GregorianCalendar) newStartOfWeekDate.clone();
+                newDate.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+                //newDate should always be greater then startDate because startDate already added and don't want days before start
+                if (newDate.compareTo(startDate) > 0) {
+                    if (newDate.compareTo(endDate) <= 0) {
+                        ScheduleEvent newEvent = (ScheduleEvent) startEvent.clone();
+                        newEvent.setTime(newDate);
+                        repeatedEvents.add(newEvent);
+                    }
+                    //Greater then end date so stop looping
+                    else {
+                        return repeatedEvents;
+                    }
+                }
+            }
+            newStartOfWeekDate.add(Calendar.DATE, 7); //Increment by 7 days/1 week
+        }
+
+        return repeatedEvents;
     }
 
     private CheckedTextView.OnClickListener checkBoxClick = new CheckedTextView.OnClickListener() {
@@ -293,6 +319,51 @@ public class AddScheduleEventFragment extends DialogFragment {
         }
     };
 
+    private View.OnClickListener timeEditClick = new EditText.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int hour;
+            int minute;
+
+            final EditText timeEdit = (EditText) view;
+
+            //Get time from stored ScheduleEvent value if there, otherwise use current
+            GregorianCalendar timestamp = event.getTime();
+            if (timestamp == null) {
+                GregorianCalendar currentTime = (GregorianCalendar) GregorianCalendar.getInstance();
+                hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                minute = currentTime.get(Calendar.MINUTE);
+                event.setTime(currentTime);
+            }
+            else {
+                hour =  timestamp.get(Calendar.HOUR_OF_DAY);
+                minute = timestamp.get(Calendar.MINUTE);
+            }
+
+            TimePickerDialog timePicker;
+            timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                    GregorianCalendar timestamp = event.getTime();
+                    if (timestamp == null) {
+                        timestamp = (GregorianCalendar) GregorianCalendar.getInstance();
+                    }
+                    timestamp.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    timestamp.set(Calendar.MINUTE, minute);
+                    timestamp.set(Calendar.SECOND, 0);
+                    timestamp.set(Calendar.MILLISECOND, 0);
+                    event.setTime(timestamp);
+
+                    String timeString = timeTo12HR(hourOfDay, minute);
+                    timeEdit.setText(timeString);
+                    validateResponses();
+                }
+            }, hour, minute, false);
+            timePicker.setTitle("Select time");
+            timePicker.show();
+        }
+    };
+
     private EditText.OnClickListener dateEditClick = new EditText.OnClickListener() {
         @Override
         public void onClick(final View view) {
@@ -305,6 +376,20 @@ public class AddScheduleEventFragment extends DialogFragment {
                     //TODO: Update ScheduleEvent object with new date
                     GregorianCalendar dateResult = (GregorianCalendar) GregorianCalendar.getInstance();
                     dateResult.set(year, month, day);
+
+                    //Save start date to ScheduleEvent object
+                    if (view.getId() == R.id.start_date) {
+                        GregorianCalendar savedTime = event.getTime();
+                        savedTime.set(year, month, day);
+                        event.setTime(savedTime);
+                    }
+                    //Save end date to variable for use later
+                    else {
+                        if (endDate == null) {
+                            endDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                        }
+                        endDate.set(year, month, day, 0, 0);
+                    }
 
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy", Locale.US);
                     String dateString = dateFormat.format(dateResult.getTime());
