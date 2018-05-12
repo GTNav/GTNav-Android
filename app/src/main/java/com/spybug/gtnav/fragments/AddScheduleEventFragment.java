@@ -373,7 +373,6 @@ public class AddScheduleEventFragment extends DialogFragment {
             datePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                    //TODO: Update ScheduleEvent object with new date
                     GregorianCalendar dateResult = (GregorianCalendar) GregorianCalendar.getInstance();
                     dateResult.set(year, month, day);
 

@@ -1,28 +1,33 @@
 package com.spybug.gtnav.fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.spybug.gtnav.R;
 import com.spybug.gtnav.activities.MainActivity;
 import com.spybug.gtnav.models.AppDatabase;
+import com.spybug.gtnav.models.HeaderItem;
+import com.spybug.gtnav.models.ListItem;
 import com.spybug.gtnav.models.ScheduleEvent;
+import com.spybug.gtnav.models.ScheduleEventAdapter;
+import com.spybug.gtnav.models.ScheduleEventItem;
 
+import java.util.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -45,9 +50,9 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
 
     private OnFragmentInteractionListener mListener;
 
-    ArrayAdapter<ScheduleEvent> listAdapter;
-    private ListView scheduleView;
-    private List<ScheduleEvent> eventList;
+    private RecyclerView recyclerView;
+    private List<ListItem> listItems = new ArrayList<>();
+    private Map<Date, List<ScheduleEvent>> eventsList;
 
     public ScheduleFragment() {
         // Required empty public constructor
@@ -75,24 +80,24 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_schedule, container, false);
-
-        eventList = new ArrayList<>();
-        scheduleView = v.findViewById(R.id.ScheduleListView);
         FloatingActionButton addFab = v.findViewById(R.id.AddToScheduleFAB);
 
-        listAdapter = new ArrayAdapter<>(v.getContext(), android.R.layout.simple_list_item_1, eventList);
-        scheduleView.setAdapter(listAdapter);
-
         List<ScheduleEvent> events = AppDatabase.getAppDatabase(getContext()).scheduleEventDao().getAll();
-        eventList.addAll(events);
 
-        scheduleView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO edit the schedule event
-                Toast.makeText(ScheduleFragment.this.getContext(), "Event Selected", Toast.LENGTH_SHORT).show();
+        Map<Date, List<ScheduleEvent>> eventsMap = toMap(events);
+
+        for (Date date : eventsMap.keySet()) {
+            HeaderItem header = new HeaderItem(date);
+            listItems.add(header);
+            for (ScheduleEvent event : eventsMap.get(date)) {
+                ScheduleEventItem item = new ScheduleEventItem(event);
+                listItems.add(item);
             }
-        });
+        }
+
+        recyclerView = v.findViewById(R.id.schedule_recyclerview);
+        recyclerView.setAdapter(new ScheduleEventAdapter(listItems));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +107,34 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
         });
 
         return v;
+    }
+
+    private Map<Date, List<ScheduleEvent>> toMap(List<ScheduleEvent> events) {
+        Map<Date, List<ScheduleEvent>> map = new TreeMap<>();
+        for (ScheduleEvent event : events) {
+            Date date = calendarToDate(event.getTime());
+
+            List<ScheduleEvent> val = map.get(date);
+            if (val == null) {
+                val = new ArrayList<>();
+                map.put(date, val);
+            }
+            val.add(event);
+        }
+
+        return map;
+    }
+
+    private Date calendarToDate(Calendar calendar) {
+        Calendar copy = (Calendar) calendar.clone();
+
+        copy.set(Calendar.MILLISECOND, 0);
+        copy.set(Calendar.SECOND, 0);
+        copy.set(Calendar.MINUTE, 0);
+        copy.set(Calendar.HOUR_OF_DAY, 0);
+        copy.set(Calendar.HOUR, 0);
+
+        return copy.getTime();
     }
 
     private void openDialog() {
@@ -116,9 +149,11 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
     // The dialog fragment sends back its finished object
     public void onDialogPositiveClick(List<ScheduleEvent> events) {
         Toast.makeText(getContext(), "Saved " + events.size() + " new events to db", Toast.LENGTH_LONG).show();
-        eventList.addAll(events);
+        //eventList.addAll(events);
         AppDatabase.getAppDatabase(getContext()).scheduleEventDao().insertAll(events);
-        listAdapter.notifyDataSetChanged();
+        //TODO: Add items to eventsList in proper spot based on dates.
+
+        //listAdapter.notifyDataSetChanged();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
