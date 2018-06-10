@@ -13,7 +13,7 @@ import com.spybug.gtnav.utils.LatLngConverter;
 import java.util.GregorianCalendar;
 
 @Entity(tableName = "schedule_event")
-public class ScheduleEvent implements Cloneable {
+public class ScheduleEvent extends ListItem implements Cloneable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -120,5 +120,10 @@ public class ScheduleEvent implements Cloneable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public int getType() {
+        return TYPE_EVENT;
     }
 }

@@ -20,7 +20,6 @@ import com.spybug.gtnav.models.HeaderItem;
 import com.spybug.gtnav.models.ListItem;
 import com.spybug.gtnav.models.ScheduleEvent;
 import com.spybug.gtnav.models.ScheduleEventAdapter;
-import com.spybug.gtnav.models.ScheduleEventItem;
 
 import java.util.Date;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
 
     private RecyclerView recyclerView;
     private List<ListItem> listItems = new ArrayList<>();
-    private Map<Date, List<ScheduleEvent>> eventsList;
+    private Map<Date, List<ScheduleEvent>> eventsMap;
 
     public ScheduleFragment() {
         // Required empty public constructor
@@ -84,15 +83,12 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
 
         List<ScheduleEvent> events = AppDatabase.getAppDatabase(getContext()).scheduleEventDao().getAll();
 
-        Map<Date, List<ScheduleEvent>> eventsMap = toMap(events);
+        eventsMap = toMap(events);
 
         for (Date date : eventsMap.keySet()) {
             HeaderItem header = new HeaderItem(date);
             listItems.add(header);
-            for (ScheduleEvent event : eventsMap.get(date)) {
-                ScheduleEventItem item = new ScheduleEventItem(event);
-                listItems.add(item);
-            }
+            listItems.addAll(eventsMap.get(date));
         }
 
         recyclerView = v.findViewById(R.id.schedule_recyclerview);
@@ -132,7 +128,6 @@ public class ScheduleFragment extends Fragment implements AddScheduleEventFragme
         copy.set(Calendar.SECOND, 0);
         copy.set(Calendar.MINUTE, 0);
         copy.set(Calendar.HOUR_OF_DAY, 0);
-        copy.set(Calendar.HOUR, 0);
 
         return copy.getTime();
     }

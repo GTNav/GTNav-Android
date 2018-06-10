@@ -7,6 +7,7 @@
         android:id="@+id/header_item_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:background="#fffae8"
         tools:text="Header"/>

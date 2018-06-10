@@ -24,11 +24,14 @@ public class ScheduleEventAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     private static class EventViewHolder extends RecyclerView.ViewHolder {
-        TextView textEvent;
+        TextView eventName, eventTime, eventLocation, eventGroupID;
 
         EventViewHolder(View itemView) {
             super(itemView);
-            textEvent = itemView.findViewById(R.id.event_item_text);
+            eventName = itemView.findViewById(R.id.event_item_name);
+            eventTime = itemView.findViewById(R.id.event_item_time);
+            eventLocation = itemView.findViewById(R.id.event_item_location);
+            eventGroupID = itemView.findViewById(R.id.event_group_id); //Testing only
         }
     }
 
@@ -64,15 +67,18 @@ public class ScheduleEventAdapter extends RecyclerView.Adapter<RecyclerView.View
             case ListItem.TYPE_HEADER: {
                 HeaderItem header = (HeaderItem) items.get(position);
                 HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
-                // your logic here
-                holder.textHeader.setText(header.getDate().toString());
+
+                holder.textHeader.setText(header.getDateString());
                 break;
             }
             case ListItem.TYPE_EVENT: {
-                ScheduleEventItem event = (ScheduleEventItem) items.get(position);
+                ScheduleEvent event = (ScheduleEvent) items.get(position);
                 EventViewHolder holder = (EventViewHolder) viewHolder;
-                // your logic here
-                holder.textEvent.setText(event.toString());
+
+                holder.eventName.setText(event.getEventName());
+                holder.eventTime.setText(event.getTime().getTime().toString());
+                holder.eventLocation.setText(event.getLocationName());
+                holder.eventGroupID.setText(Long.toString(event.getGroupId()));
                 break;
             }
             default:

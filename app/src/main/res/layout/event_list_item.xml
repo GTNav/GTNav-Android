@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffe2c5"
+    android:orientation="vertical">
+
     <TextView
-        android:id="@+id/event_item_text"
+        android:id="@+id/event_item_name"
+        android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/cardview_light_background"
-        tools:text="Header"/>
+        tools:text="Event Name" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/event_item_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Time: 00:00" />
+
+    <TextView
+        android:id="@+id/event_item_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Location Name" />
+
+    <TextView
+        android:id="@+id/event_group_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Group ID (testing)" />
+
+</LinearLayout>
